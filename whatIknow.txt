@@ -1,0 +1,72 @@
+An agentic ai will be get created
+
+sample_deletion_request.csv
+
+case_31, a.eze08@gmail.com, requested 2026-09-04, reported COMPLETE, audit_at 2026-09-15T12:00
+"Please remove my name and contact details, but keeping an internal
+ deleted-account reference is fine if other required records still depend on it."
+
+
+user_identities.csv
+user_541, Amara Eze, a.eze08@gmail.com, +234 803 052 7943, 1b7bf5a9…
+
+system_activity.csv
+activity_3682  2026-09-06 10:45  DELETE_RECORD  account_service   account_4857   SUCCESS
+activity_3687  2026-09-06 11:31  REDACT_RECORD  identity_service  tombstone_440  SUCCESS
+
+evidence_51 the snapshot
+
+account_service / customer_profiles:  "records": []          ← account_4857 is gone
+identity_service / deleted_customer_references:
+  { "resource_id": "tombstone_440", "subject_reference": "user_541",
+    "name": null, "email": null, "phone": null, "email_hash": null,
+    "account_status": "DELETED" }
+security_service / security_audit_events:
+  { "resource_id": "audit_record_6909", "subject_reference": "user_541",
+    "event_name": "account_deletion_reviewed" }
+
+    account is absent
+    audit record is still present
+    the tombstone is REDACTED
+
+
+
+user_identifies.csv ? 
+
+tombstone_9178 "Kofi Addo"
+
+
+rule_07: ANALYTICS_PROFILE → ANONYMIZE.
+rule_08: PRODUCT_TELEMETRY → ANONYMIZE.
+
+analytics_4574
+
+"user_id": null, "email": null, "phone": null, "email_hash": null,
+"metrics": { "sessions_30d": 4, "products_viewed_30d": 21,
+             "orders_completed_90d": 4, "revenue_90d_usd": 208.28 }
+
+how this analytics will get use
+
+"how much does a typical home-lifestyle shopper spend?” -> but not the shopper is
+
+"analytics_9914" review needed
+
+
+Let's the solution audit begins.
+
+Explain me the output.csv for the case_06
+
+Does an specific user have specific user row for logs (Y/N) : 
+
+How and where in the code they have asked it. 
+1. Did they really ask for deletion? (intent.py)
+2. Who are they, under every old name? (identity.py)
+3. Which records belong to them? (linking.py)
+4. What state was each record in on audit_at? (state.py)
+5. What does the rulebook say, and does the record pass? (policy.py, then planner.py writes the steps)
+
+How did it flag something as delete ?
+Does it delete the both emails if ask for deletion where it is in the code? 
+-> using the resolver 
+
+LinkReason

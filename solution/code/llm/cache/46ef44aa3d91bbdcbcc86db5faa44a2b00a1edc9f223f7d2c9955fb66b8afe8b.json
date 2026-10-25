@@ -1,0 +1,120 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": "marcus.lee@northstar.shop",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "export_1261",
+    "restore_allowed": null,
+    "status": "Collecting",
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "export_1261",
+    "phone": null,
+    "resource_id": "customer_export_1261.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "ingrid.dahl@outlook.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "export_1260",
+    "restore_allowed": null,
+    "status": "Ready",
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "export_1260",
+    "phone": null,
+    "resource_id": "customer_export_1260.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "sara.kim@northstar.shop",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "export_1259",
+    "restore_allowed": null,
+    "status": "Packaging",
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "export_1259",
+    "phone": null,
+    "resource_id": "customer_export_1259.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "daniel.park@northstar.shop",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "export_1258",
+    "restore_allowed": null,
+    "status": "Ready",
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "export_1258",
+    "phone": null,
+    "resource_id": "customer_export_1258.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1839,
+  "output_tokens": 585,
+  "thinking_tokens": 609
+ }
+}

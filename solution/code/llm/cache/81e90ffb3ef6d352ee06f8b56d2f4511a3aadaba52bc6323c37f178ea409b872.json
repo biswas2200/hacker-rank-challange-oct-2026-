@@ -1,0 +1,23 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "intent-v2",
+ "purpose": "intent",
+ "response": {
+  "ACCESS": [],
+  "CORRECTION": [],
+  "DELETE": [
+   "custom_03"
+  ],
+  "EXPORT": [
+   "custom_01"
+  ],
+  "OPT_OUT": [],
+  "OTHER": []
+ },
+ "thinking_level": "HIGH",
+ "usage": {
+  "input_tokens": 534,
+  "output_tokens": 30,
+  "thinking_tokens": 893
+ }
+}

@@ -1,0 +1,1337 @@
+<title>Ghost Data Audit Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky left index of sections + one long reading column; diagrams and tables scroll inside their own frames. Evidence-ledger look: cool paper, ink, three phase colors. */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --sunk:#e8ecee; --ink:#15212b; --muted:#56656f; --line:#cfd7dc;
+  --accent:#1d6a86; --accent-soft:#d9ebf2;
+  --find:#b4531a; --find-soft:#f8e6da;
+  --rem:#2f5fb3; --rem-soft:#dfe8f8;
+  --ver:#2e7d4f; --ver-soft:#dcefe3;
+  --warn:#9a6a00; --warn-soft:#f6ecd0;
+  --gem:#6b4fb3; --gem-soft:#ebe5f8;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161b; --surface:#16212a; --sunk:#1d2a34; --ink:#e3eaee; --muted:#9aabb6; --line:#2c3b46;
+  --accent:#5fb4d3; --accent-soft:#163847;
+  --find:#f0965c; --find-soft:#3a2416; --rem:#86a9f0; --rem-soft:#1c2b48; --ver:#6fcf97; --ver-soft:#15332250;
+  --warn:#e3b341; --warn-soft:#3a2f12; --gem:#b39cf0; --gem-soft:#2a2245; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161b; --surface:#16212a; --sunk:#1d2a34; --ink:#e3eaee; --muted:#9aabb6; --line:#2c3b46;
+  --accent:#5fb4d3; --accent-soft:#163847;
+  --find:#f0965c; --find-soft:#3a2416; --rem:#86a9f0; --rem-soft:#1c2b48; --ver:#6fcf97; --ver-soft:#15332250;
+  --warn:#e3b341; --warn-soft:#3a2f12; --gem:#b39cf0; --gem-soft:#2a2245; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--sunk);padding:1px 5px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:2.3rem;font-weight:700}
+h2{font-size:1.65rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:600}
+h4{font-size:.98rem;font-weight:600}
+p{margin:0;max-width:72ch}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:40px;max-width:1340px;margin:0 auto;padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);align-self:start;display:flex;flex-direction:column;gap:2px;font-size:.88rem}
+nav.index .brand{font-family:var(--display);font-weight:700;font-size:1.05rem;margin-bottom:12px}
+nav.index a{text-decoration:none;color:var(--muted);padding:5px 10px;border-radius:6px;display:flex;gap:10px}
+nav.index a span{font-family:var(--mono);font-size:.75rem;opacity:.7;min-width:20px;padding-top:2px}
+nav.index a:hover,nav.index a.on{background:var(--sunk);color:var(--ink)}
+main{display:flex;flex-direction:column;gap:64px;min-width:0}
+section{display:flex;flex-direction:column;gap:18px;scroll-margin-top:20px}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.06rem;color:var(--muted);max-width:68ch}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-size:1.8rem;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:.82rem}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.72rem;font-weight:500;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);white-space:nowrap}
+.chip.find{background:var(--find-soft);color:var(--find);border-color:transparent}
+.chip.rem{background:var(--rem-soft);color:var(--rem);border-color:transparent}
+.chip.ver{background:var(--ver-soft);color:var(--ver);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.gem{background:var(--gem-soft);color:var(--gem);border-color:transparent}
+.chip.acc{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.frame{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--sunk);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td.mono,td code{white-space:nowrap}
+button,select,input[type=text],textarea{font:inherit;color:var(--ink)}
+button{cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;font-size:.88rem}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=text]{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 10px;font-size:.9rem;max-width:100%}
+textarea{width:100%;min-height:230px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.78rem;line-height:1.45;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;max-width:none}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.gem{border-color:var(--gem);background:var(--gem-soft)}
+pre.code{margin:0;background:var(--sunk);border-radius:8px;padding:14px;overflow-x:auto;font-family:var(--mono);font-size:.78rem;line-height:1.5}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;margin:0}
+/* architecture */
+#arch svg{display:block;min-width:900px;width:100%;height:auto}
+#arch .node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+#arch .node text{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
+#arch .node .sub{fill:var(--muted);font-size:10px}
+#arch .node{cursor:pointer}
+#arch .node:hover rect,#arch .node.sel rect{stroke:var(--accent);stroke-width:2}
+#arch .node.gem rect{fill:var(--gem-soft);stroke:var(--gem)}
+#arch .node.core rect{fill:var(--accent-soft)}
+#arch .node.io rect{fill:var(--sunk)}
+#arch .lane{fill:none;stroke:var(--line);stroke-dasharray:4 4}
+#arch .lanelabel{fill:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.08em}
+#arch .edge{fill:none;stroke:var(--muted);stroke-width:1.1;opacity:.55}
+#arch .edge.gem{stroke:var(--gem);stroke-dasharray:5 4;opacity:.9}
+#arch .edge.hot{stroke:var(--accent);opacity:1;stroke-width:2}
+#arch marker path{fill:var(--muted)}
+.detail{min-height:120px}
+/* pipeline */
+.stepper{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.stepper button{flex:1 0 128px;text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px}
+.stepper button small{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.stepper button.on{border-color:var(--accent);background:var(--accent-soft)}
+.kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 14px;font-size:.9rem}
+.kv dt{color:var(--muted);font-family:var(--mono);font-size:.76rem;padding-top:2px}
+.kv dd{margin:0;min-width:0}
+/* roadmap */
+.road{display:flex;flex-direction:column;gap:10px}
+.ms{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.ms summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px}
+.ms summary::-webkit-details-marker{display:none}
+.ms .tag{font-family:var(--mono);font-weight:600;color:var(--accent);font-size:.95rem}
+.ms .meta{font-size:.8rem;color:var(--muted)}
+.ms .body{padding:0 16px 16px 84px;display:flex;flex-direction:column;gap:12px}
+.task{border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.task ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:.9rem}
+.bar{height:6px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:90px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+label.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:7px;cursor:pointer}
+label.chk:hover{background:var(--sunk)}
+label.chk input{margin-top:4px;accent-color:var(--accent)}
+label.chk small{display:block;color:var(--muted)}
+/* scenario */
+.scen-list{display:flex;flex-wrap:wrap;gap:6px}
+.scen-list button.on{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.lanes{display:flex;flex-direction:column;gap:0}
+.lanestep{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.lanestep:last-child{border-bottom:0}
+.lanestep .st{font-family:var(--mono);font-size:.76rem;color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+.lanestep .st i{width:9px;height:9px;border-radius:50%;background:var(--line);margin-top:4px;flex:none}
+.lanestep.key .st i{background:var(--find)}
+.lanestep.key{background:linear-gradient(90deg,var(--find-soft),transparent 70%)}
+.steps td:first-child{font-family:var(--mono);color:var(--muted)}
+tr.p-FINDING td:nth-child(2){color:var(--find)}
+tr.p-REMEDIATION td:nth-child(2){color:var(--rem)}
+tr.p-VERIFICATION td:nth-child(2){color:var(--ver)}
+.issues{display:flex;flex-direction:column;gap:6px;font-size:.88rem}
+.issue{display:flex;gap:8px;align-items:flex-start}
+.ok{color:var(--ver)} .bad{color:var(--find)}
+.metric{display:flex;flex-direction:column;gap:4px}
+.metric b{font-family:var(--display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.filter{max-width:340px}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:24px}
+  nav.index{position:static;flex-direction:row;flex-wrap:wrap;gap:4px}
+  nav.index .brand{width:100%}
+  .ms .body{padding-left:16px}
+  .lanestep{grid-template-columns:minmax(0,1fr);gap:4px}
+  .kv{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="shell">
+<nav class="index" aria-label="Sections">
+  <div class="brand">Ghost Data Audit</div>
+  <a href="#overview"><span>01</span>Overview</a>
+  <a href="#roadmap"><span>02</span>Roadmap &amp; tasks</a>
+  <a href="#architecture"><span>03</span>System architecture</a>
+  <a href="#hld"><span>04</span>High-level design</a>
+  <a href="#lld"><span>05</span>Low-level design</a>
+  <a href="#classes"><span>06</span>Class diagram &amp; API</a>
+  <a href="#pipeline"><span>07</span>Pipeline</a>
+  <a href="#scenarios"><span>08</span>Data flow per case type</a>
+  <a href="#gemini"><span>09</span>Gemini layer</a>
+  <a href="#playground"><span>10</span>Playground</a>
+  <a href="#tradeoffs"><span>11</span>Trade-offs &amp; risks</a>
+  <a href="#questions"><span>12</span>Open questions</a>
+  <a href="#preflight"><span>13</span>Pre-flight checklist</a>
+  <a href="#decisions"><span>14</span>Decision log</a>
+</nav>
+
+<main>
+
+<!-- 01 -->
+<section id="overview">
+  <div class="eyebrow">HackerRank Orchestrate · Oct 2026 · Design review draft</div>
+  <h1>Ghost Data deletion-audit agent: blueprint</h1>
+  <div class="row" aria-label="Build status"><span class="chip ver">M0 setup · done</span><span class="chip ver">M1 evidence loading · done</span><span class="chip warn">M2 identity &amp; linking · in review</span><span class="chip ver">M3 state &amp; policy · done</span><span class="chip ver">M4 steps, output &amp; eval · done</span><span class="chip">M5–M7 · not started</span><span class="chip acc">Samples: status 32/32 · step F1 97.6%</span><span class="chip acc">Updated 2026-10-25</span></div>
+  <p class="lede">The agent reads a deletion request, works out who the person is (including old emails), finds every copy of their data, reconstructs what was true at <code>audit_at</code>, applies <code>deletion_rules.csv</code>, and writes an ordered plan of findings, remediation and verification steps to <code>output.csv</code>.</p>
+  <div class="grid g4">
+    <div class="panel stat"><b>518</b><small>requests to audit</small></div>
+    <div class="panel stat"><b>32</b><small>sample cases with answers (22 INCOMPLETE, 10 COMPLETE)</small></div>
+    <div class="panel stat"><b>94</b><small>evidence files: 28 JSON, 26 logs, 24 SQL, 11 PNG, 4 PDF, 1 TXT</small></div>
+    <div class="panel stat"><b>4,011</b><small>activity rows, including decoys and unrelated users</small></div>
+  </div>
+  <div class="grid g2">
+    <div class="panel">
+      <h3>Design principles</h3>
+      <ul class="clean">
+        <li><b>Evidence over claims.</b> <code>reported_status</code> and <code>reported_result</code> are hints. A snapshot captured at or before <code>audit_at</code> decides the state.</li>
+        <li><b>Deterministic core.</b> Same input, same output, byte for byte. Sorting and JSON serialization are fixed.</li>
+        <li><b>Gemini for perception only.</b> It classifies request intent and reads images and PDFs. It never decides a status.</li>
+        <li><b>Cache everything the model produces.</b> A second run costs zero tokens and runs offline.</li>
+        <li><b>Measure against the 32 samples on every change.</b></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>What “COMPLETE” means here</h3>
+      <ul class="clean">
+        <li>Every relevant copy got the treatment its rule requires (delete, redact, anonymize, retain).</li>
+        <li>No active sync, import or restore path can recreate the data.</li>
+        <li>Retained records keep only permitted identifiers. Tombstones keep <code>user_id</code> only.</li>
+        <li>Records the policy says to keep still exist.</li>
+      </ul>
+      <p class="mono" style="color:var(--muted)">Anything else is INCOMPLETE. A request that doesn’t ask for deletion is NOT_APPLICABLE with <code>[]</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="roadmap">
+  <div class="eyebrow">02 · Roadmap</div>
+  <h2>Milestones, tasks and steps</h2>
+  <p class="lede">The critical path is M1 → M2 → M3 → M4. M5 (Gemini) can be built alongside M2–M4 because the pipeline runs on a keyword classifier until it lands. Tick tasks as they finish. Progress is saved in this browser only.</p>
+  <div class="row"><span class="mono" id="roadPct">0% done</span><div class="bar" style="flex:1"><i id="roadBar"></i></div><button id="roadReset" type="button">Clear ticks</button></div>
+  <div class="road" id="road"></div>
+</section>
+
+<!-- 03 -->
+<section id="architecture">
+  <div class="eyebrow">03 · System architecture</div>
+  <h2>Components and how data moves between them</h2>
+  <p class="lede">Five layers, left to right. Click any box to see what it owns, what it reads and what it emits. Dashed purple lines are the only places Gemini is called.</p>
+  <div class="frame" id="arch"></div>
+  <div class="panel detail" id="archDetail"><p style="color:var(--muted)">Select a component in the diagram.</p></div>
+</section>
+
+<!-- 04 -->
+<section id="hld">
+  <div class="eyebrow">04 · High-level design</div>
+  <h2>Responsibilities, boundaries and non-functional goals</h2>
+  <div class="frame"><table>
+    <thead><tr><th>Layer</th><th>Component</th><th>Responsibility</th><th>Input → output</th></tr></thead>
+    <tbody>
+      <tr><td>Ingestion</td><td><code>DatasetRepository</code></td><td>Loads the seven CSVs into typed records with UTC timestamps.</td><td>dataset/*.csv → typed lists and lookup maps</td></tr>
+      <tr><td>Ingestion</td><td><code>EvidenceLoader</code> ×6</td><td>One loader per format flattens a file into field/value records. No interpretation.</td><td>evidence/* → <code>RawEvidenceRecord[]</code></td></tr>
+      <tr><td>Ingestion</td><td><code>RecordNormalizer</code></td><td>The one place that interprets fields: resource, system, category, presence, status, identifiers, parent.</td><td>RawEvidenceRecord → <code>Observation</code></td></tr>
+      <tr><td>Knowledge</td><td><code>EvidenceIndex</code></td><td>Holds every observation, indexed by resource, identifier and capture time.</td><td>Observation[] → queries</td></tr>
+      <tr><td>Reasoning</td><td><code>IntentClassifier</code></td><td>Decides whether the request text authorizes deletion. Keyword + Gemini ensemble.</td><td>request_text → DELETE / ACCESS / EXPORT / CORRECTION / OPT_OUT / OTHER</td></tr>
+      <tr><td>Reasoning</td><td><code>IdentityResolver</code></td><td>Maps the request email to a user and collects current and historical identifiers up to <code>audit_at</code>.</td><td>email, cutoff → <code>SubjectProfile</code></td></tr>
+      <tr><td>Reasoning</td><td><code>RequestEpisodes</code></td><td>Splits a repeat requester's history so each request only uses evidence after their previous audit.</td><td>requests → episode start per request</td></tr>
+      <tr><td>Reasoning</td><td><code>WorkflowWindowMatcher</code></td><td>Matches identifier-free records to requests through deletion-worker activity in each request's window.</td><td>deletion requests → matched activities per case</td></tr>
+      <tr><td>Reasoning</td><td><code>ResourceLinker</code></td><td>Finds every resource tied to the subject: evidence matches, catalog links, parent links, matcher results.</td><td>SubjectProfile, request → <code>ResourceLink[]</code></td></tr>
+      <tr><td>Reasoning</td><td><code>StateReconstructor</code></td><td>Determines each resource’s state at the cutoff. Handles replica drift and sync recreation.</td><td>ResourceRef, cutoff → <code>ResourceState</code></td></tr>
+      <tr><td>Reasoning</td><td><code>PolicyEngine</code></td><td>Maps the data category to a rule and compares required treatment with actual state.</td><td>ResourceState → <code>Decision</code></td></tr>
+      <tr><td>Reasoning</td><td><code>RiskDetector</code> <span class="chip">folded in</span></td><td>Not a separate class: flows and backups are linked like any record; StateReconstructor reads enabled / restore_allowed and PolicyEngine reports them.</td><td>profile, resources → flow / backup states</td></tr>
+      <tr><td>Reasoning</td><td><code>StepPlanner</code></td><td>Builds findings, remediation and verification steps in contract order.</td><td>Decision[] → <code>Step[]</code>, status</td></tr>
+      <tr><td>Output</td><td><code>OutputWriter</code> / <code>OutputValidator</code></td><td>Writes output.csv deterministically and checks it against the contract.</td><td>CaseResult[] → output.csv, issues</td></tr>
+      <tr><td>Output</td><td><code>Evaluator</code> / <code>UsageTracker</code></td><td>Scores predictions against samples and summarizes Gemini token use.</td><td>output + gold → reports (.md)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g3">
+    <div class="panel"><h4>Determinism</h4><p>Sorted iteration everywhere, temperature 0, cached model output, <code>json.dumps(sort_keys=True, separators=(",",":"))</code>.</p></div>
+    <div class="panel"><h4>Cost</h4><p>About 26 Gemini calls in a cold run (11 classification batches + 15 media files). Zero on a warm run.</p></div>
+    <div class="panel"><h4>Resilience</h4><p><code>--no-llm</code> runs fully offline from cache and keyword rules. Failed batches retry with backoff, then fall back.</p></div>
+    <div class="panel"><h4>Traceability</h4><p>Every step carries the <code>evidence_id</code> that proved it. A <code>--explain case_11</code> flag prints the decision trail.</p></div>
+    <div class="panel"><h4>Security</h4><p>No API key at all: Gemini runs on Vertex AI with Application Default Credentials. <code>.env</code> holds only optional project/model overrides and is git-ignored.</p></div>
+    <div class="panel"><h4>Stack</h4><p>Python 3.14.4, stdlib <code>sqlite3</code>/<code>csv</code>/<code>json</code>, <code>google-genai</code> 2.33.0, <code>pypdf</code> 6.21.2, <code>python-dotenv</code> 1.2.4.</p></div>
+  </div>
+  <h3>Dataset relationships</h3>
+  <p>The manifest doesn’t say which case a file belongs to. The links run through contents: email → user_id → resource_id → evidence rows.</p>
+<pre class="mermaid">
+erDiagram
+  DELETION_REQUEST }o--|| USER_IDENTITY : "email (current)"
+  DELETION_REQUEST }o--o| USER_AUDIT_LOG : "email (historical old_value)"
+  USER_AUDIT_LOG }o--|| USER_IDENTITY : user_id
+  USER_IDENTITY ||--o{ SYSTEM_ACTIVITY : "LINK_RESOURCE_IDENTITY details"
+  SYSTEM_ACTIVITY }o--|| RESOURCE : resource_id
+  EVIDENCE_FILE ||--o{ OBSERVATION : "parsed contents"
+  OBSERVATION }o--|| RESOURCE : resource_id
+  OBSERVATION }o--o| USER_IDENTITY : "email / user_id / phone / hash"
+  RESOURCE }o--|| DELETION_RULE : data_category
+  RESOURCE }o--o| RESOURCE : "parent (e.g. search -> account)"
+</pre>
+</section>
+
+<!-- 05 -->
+<section id="lld">
+  <div class="eyebrow">05 · Low-level design</div>
+  <h2>Modules, data models and core algorithms</h2>
+  <div class="grid g2">
+    <div class="panel">
+      <h3>Package layout</h3>
+<pre class="code">solution/
+├── code/
+│   ├── main.py                 # CLI: run | eval | validate | explain
+│   ├── config.py               # Settings, paths, model name, flags
+│   ├── models.py               # dataclasses + enums (below)
+│   ├── repository.py           # DatasetRepository
+│   ├── loaders/
+│   │   ├── base.py             # EvidenceLoader (abstract), registry
+│   │   ├── sql_loader.py       # sqlite3 :memory: per file
+│   │   ├── json_loader.py
+│   │   ├── log_loader.py       # regex line parser
+│   │   ├── text_loader.py      # pipe-delimited handover records
+│   │   ├── pdf_loader.py       # pypdf, Gemini fallback
+│   │   ├── image_loader.py     # Gemini vision, cached (M5)
+│   │   └── record_normalizer.py# RecordNormalizer: raw → Observation
+│   ├── core/
+│   │   ├── index.py            # EvidenceIndex
+│   │   ├── intent.py           # KeywordIntentClassifier (+ Gemini in M5)
+│   │   ├── identity.py         # IdentityResolver, SubjectProfile
+│   │   ├── episodes.py         # RequestEpisodes
+│   │   ├── workflow_matching.py# WorkflowWindowMatcher
+│   │   ├── linking.py          # ResourceLinker, ResourceLink
+│   │   ├── state.py            # StateReconstructor
+│   │   ├── policy.py           # PolicyEngine
+│   │   ├── state.py            # StateReconstructor, Condition
+│   │   ├── policy.py           # PolicyEngine, Decision, Treatment
+│   │   ├── planner.py          # StepPlanner, step_sort_key
+│   │   └── auditor.py          # CaseAuditor (orchestrator)
+│   ├── llm/
+│   │   ├── gemini_client.py    # GeminiClient, UsageTracker
+│   │   ├── cache.py            # ResponseCache (content-hash JSON)
+│   │   └── prompts/            # intent.md, media_extract.md
+│   ├── output/
+│   │   ├── writer.py           # OutputWriter
+│   │   └── validator.py        # OutputValidator
+│   └── evaluation/
+│       ├── evaluate.py         # Evaluator
+│       ├── custom_cases/       # 3+ hand-built cases
+│       ├── evaluation_report.md
+│       └── usage_report.md
+├── output.csv
+└── README.md</pre>
+    </div>
+    <div class="panel">
+      <h3>Core data models (<code>models.py</code>)</h3>
+<pre class="code">@dataclass(frozen=True)
+class RawEvidenceRecord:     # what a loader emits
+    file_id: str; observed_at: datetime
+    location: str           # SQL table / JSON path / log line
+    fields: dict            # flattened field → value
+    system_hint: str|None
+    is_listing_row: bool    # a dump row exists by being listed
+
+@dataclass(frozen=True)
+class Observation:           # what RecordNormalizer emits
+    file_id: str            # evidence_03
+    observed_at: datetime   # when the fact was true
+    location: str           # "replica" in it ⇒ replica copy
+    resource_id: str        # search_052
+    system_id: str          # search_service
+    data_category: str|None # SEARCH_INDEX_ENTRY (if stated)
+    presence: Presence      # PRESENT / ABSENT / UNSTATED
+    stated_condition: str|None  # IDENTIFIABLE, ANONYMIZED, DELETED…
+    subject_user_id: str|None   # user_32
+    emails, phones, names, email_hashes: frozenset[str]
+    parent_resource_id: str|None  # account_006 for search_001
+    is_flow_enabled: bool|None
+    is_restore_allowed: bool|None
+
+# visibility uses observed_at &lt;= audit_at;
+# citing a file needs captured_at &lt;= audit_at
+
+class Condition(Enum):         # core/state.py
+    ABSENT PRESENT_IDENTIFIABLE PRESENT_DEIDENTIFIED
+    FLOW_ACTIVE FLOW_DISABLED RESTORE_OPEN RESTORE_BLOCKED UNKNOWN
+
+@dataclass(frozen=True)
+class SnapshotListing:         # a complete store listing
+    file_id; observed_at; system_id; location
+    resource_ids: frozenset[str]  # missing ⇒ gone
+
+@dataclass
+class SubjectProfile:
+    user_id: str
+    emails: set[str]; phones: set[str]
+    names: set[str];  email_hashes: set[str]
+    identity_change_audit_ids: list[str]
+    # searchable_identifiers excludes names (decoy namesakes)
+
+@dataclass
+class ResourceLink:
+    resource_id: str; system_id: str
+    reasons: set[LinkReason]  # EVIDENCE_IDENTIFIER, CATALOG_LINK,
+                              # PARENT_RESOURCE, WORKFLOW_WINDOW
+    proof_ids: set[str]; aliases: set[str]
+
+@dataclass(frozen=True)
+class ResourceState:
+    resource_id: str; system_id: str
+    condition: Condition
+    evidence_id: str|None   # file or activity that proves it
+    as_of: datetime|None
+    stated_category: str|None   # from evidence
+    intended_action: str|None   # what the workflow tried
+    latest_activity_id: str|None  # citation fallback
+
+@dataclass(frozen=True)
+class Decision:
+    state: ResourceState
+    treatment: Treatment    # DELETE/REDACT/ANONYMIZE/RETAIN/
+                            # BLOCK_RESTORE/DISABLE_FLOW
+    finding: Operation|None # None ⇒ compliant
+    remediation: Operation|None
+    verification: Operation
+
+@dataclass
+class Step:
+    step_no: int; phase: Phase; system_id: str
+    resource_id: str; operation: Operation
+    state: str; evidence_id: str</pre>
+    </div>
+  </div>
+
+  <h3>Key algorithms</h3>
+  <div class="grid g2">
+    <div class="panel">
+      <h4>State at audit_at (<code>StateReconstructor.state_at</code>, built)</h4>
+<pre class="code">obs = index.by_resource(rid, cutoff), inside the episode,
+      from files captured by the cutoff
+reading(o):
+  data_flow: enabled / ACTIVE → FLOW_ACTIVE, else FLOW_DISABLED
+  backup:    restore_allowed / eligible → RESTORE_OPEN,
+             deletion_block / decision=deny → RESTORE_BLOCKED
+  other:     404 / rows=0 / NOT_FOUND → ABSENT
+             present + name/email/phone/hash → PRESENT_IDENTIFIABLE
+             present without them → PRESENT_DEIDENTIFIED
+latest reading wins; a replica still holding the record
+  beats a "gone" reading (replication drift)
+nothing? → complete store listing taken after the last
+  workflow action that omits the record → ABSENT
+nothing? → connector / restore-access check activity
+nothing? → UNKNOWN (no finding; claims are not proof)</pre>
+    </div>
+    <div class="panel">
+      <h4>Linking (<code>ResourceLinker.link</code>, built)</h4>
+<pre class="code">start = episodes.starts_after(request)   # repeat requester?
+keep(x) = start is None or x.time > start
+links  = evidence obs carrying any identifier   (keep)
+       + LINK_RESOURCE_IDENTITY naming the person (keep)
+       + parents / children of linked records   (keep)
+       + matcher.matched_activities(case_id)
+# matcher, for records that name nobody:
+candidates = deletion_worker activity in
+             [reported_at − 1.5h, min(reported_at + 2h, audit_at)]
+             of deletion requests only
+drop: owned by another person · type already proven ·
+      other wording family · claim mismatch (accounts)
+repeat until stable; then pair k-to-k ties in order
+(marked paired = guess)</pre>
+    </div>
+    <div class="panel">
+      <h4>Rule → treatment (<code>PolicyEngine.evaluate</code>, built: category stated in evidence → workflow’s attempted action → resource type)</h4>
+<pre class="code">USER_PROFILE, SECONDARY_IDENTIFIER, SEARCH_INDEX_ENTRY,
+CACHE_ENTRY, SUPPORT_ATTACHMENT, USER_EXPORT,
+MARKETING_PROFILE                       → DELETE   (target ABSENT)
+SUPPORT_MESSAGE, EMAIL_DELIVERY_LOG     → REDACT   (target REDACTED)
+ACCOUNT_TOMBSTONE                       → REDACT   (keep user_id only)
+ANALYTICS_PROFILE, PRODUCT_TELEMETRY    → ANONYMIZE
+SECURITY_AUDIT_LOG, LEGAL_HOLD_RECORD   → RETAIN   (target PRESENT)
+BACKUP_ARCHIVE                          → RETAIN + BLOCK_RESTORE
+DATA_FLOW (sync/import connector)       → DISABLE
+
+compliant = state == target
+finding   = REMAINING_RECORD if target ABSENT and state PRESENT
+          | EXPOSED_PII     if target REDACTED/ANONYMIZED and PII_EXPOSED
+          | ACTIVE_DATA_FLOW / RESTORE_RISK for flows and backups</pre>
+    </div>
+    <div class="panel">
+      <h4>Step ordering (<code>StepPlanner._sort_key</code>)</h4>
+<pre class="code">PHASE = [FINDING, REMEDIATION, VERIFICATION]
+OP_ORDER = [
+  REPORT_REMAINING_RECORD, REPORT_EXPOSED_PII,
+  REPORT_ACTIVE_DATA_FLOW, REPORT_RESTORE_RISK,
+  DISABLE_DATA_FLOW, BLOCK_RESTORE, DELETE_RECORD,
+  REDACT_RECORD, ANONYMIZE_RECORD,
+  VERIFY_RECORD_ABSENT, VERIFY_RECORD_PRESENT,
+  VERIFY_RECORD_REDACTED, VERIFY_RECORD_ANONYMIZED,
+  VERIFY_DATA_FLOW_DISABLED, VERIFY_RESTORE_BLOCKED]
+key = (PHASE.index(p), OP_ORDER.index(op), system_id, resource_id)
+# flows/restores sort before deletes in REMEDIATION,
+# which is the "stop recreation first" rule for free.</pre>
+    </div>
+    <div class="panel">
+      <h4>Status and verification set (<code>CaseAuditor.audit</code>)</h4>
+<pre class="code">if intent != DELETE:          return NOT_APPLICABLE, []
+profile = identity.resolve(email, audit_at)
+decisions = [policy.evaluate(state.state_at(r)) for r in linker.link(profile)]
+decisions += risks.detect(profile, audit_at)
+bad = [d for d in decisions if not d.compliant]
+if not bad:
+    return COMPLETE, verifications(decisions, cite=True)
+return INCOMPLETE, findings(bad, cite=True)
+                 + remediations(bad, evidence="")
+                 + verifications(decisions, evidence="")
+# verification covers ALL relevant resources (samples:
+# account ABSENT + audit_record PRESENT appear even when
+# only search_052 needed fixing)</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="classes">
+  <div class="eyebrow">06 · Class diagram &amp; API</div>
+  <h2>Classes, methods and functions</h2>
+<pre class="mermaid">
+classDiagram
+  direction LR
+  class CaseAuditor {
+    +audit(request) CaseResult_AuditTrail
+  }
+  class DatasetRepository {
+    +load(dataset_dir)
+    +requests() List~Request~
+    +identity_by_email(email) Identity
+    +audit_for_user(user_id) List~AuditEntry~
+    +activity_for_resource(rid) List~Activity~
+    +rule_for(category) Rule
+  }
+  class EvidenceLoader {
+    <<abstract>>
+    +supports(path) bool
+    +load(evidence_file, path) List~RawEvidenceRecord~
+  }
+  class RecordNormalizer {
+    +normalize(record) Observation
+  }
+  class RequestEpisodes {
+    +starts_after(request) datetime
+  }
+  class WorkflowWindowMatcher {
+    +matched_activities(case_id) List~SystemActivity~
+    +paired_resources Set~str~
+    +unresolved_candidates Dict
+    -pair_tied_groups()
+  }
+  class SqlLoader
+  class JsonLoader
+  class LogLoader
+  class TextLoader
+  class PdfLoader
+  class ImageLoader
+  class EvidenceIndex {
+    +build(repository, loaders)
+    +by_resource(rid, cutoff) List~Observation~
+    +by_identifier(value, cutoff) List~Observation~
+    +by_parent(rid, cutoff) List~Observation~
+    +is_citable_at(file_id, cutoff) bool
+  }
+  class IntentClassifier {
+    <<interface>>
+    +classify(requests) Dict~str,IntentResult~
+  }
+  class KeywordIntentClassifier
+  class GeminiIntentClassifier
+  class EnsembleIntentClassifier
+  class IdentityResolver {
+    +resolve(request_email, cutoff) SubjectProfile
+    -historical_identifiers(user_id, cutoff)
+    -email_hash(email) str
+  }
+  class ResourceLinker {
+    +link(profile, request) List~ResourceLink~
+    -catalog_links_for(profile, cutoff)
+    -add_parent_resources(links)
+  }
+  class StateReconstructor {
+    +state_at(link, request) ResourceState
+    -reading_from(observation)
+    -combine(readings)
+    -absence_by_omission(link)
+    -reading_from_checks(activities)
+  }
+  class PolicyEngine {
+    +treatment_for(state) Treatment
+    +evaluate(state) Decision
+  }
+  class StepPlanner {
+    +plan(decisions) Status_Steps
+  }
+  class GeminiClient {
+    +generate_json(prompt, schema, parts) dict
+  }
+  class ResponseCache {
+    +get(key) dict
+    +put(key, value)
+  }
+  class UsageTracker {
+    +record(model, usage)
+    +to_markdown() str
+  }
+  class OutputWriter {
+    +write(results, path)
+    +serialize(steps) str
+  }
+  class OutputValidator {
+    +validate(path, requests) List~Issue~
+  }
+  class Evaluator {
+    +compare(pred, gold) Metrics
+    +to_markdown(metrics) str
+  }
+  EvidenceLoader <|-- SqlLoader
+  EvidenceLoader <|-- JsonLoader
+  EvidenceLoader <|-- LogLoader
+  EvidenceLoader <|-- TextLoader
+  EvidenceLoader <|-- PdfLoader
+  EvidenceLoader <|-- ImageLoader
+  IntentClassifier <|.. KeywordIntentClassifier
+  IntentClassifier <|.. GeminiIntentClassifier
+  IntentClassifier <|.. EnsembleIntentClassifier
+  EnsembleIntentClassifier o-- KeywordIntentClassifier
+  EnsembleIntentClassifier o-- GeminiIntentClassifier
+  EvidenceIndex o-- EvidenceLoader
+  EvidenceIndex --> RecordNormalizer
+  ResourceLinker --> WorkflowWindowMatcher
+  ResourceLinker --> RequestEpisodes
+  WorkflowWindowMatcher --> RequestEpisodes
+  WorkflowWindowMatcher --> EvidenceIndex
+  RequestEpisodes --> IdentityResolver
+  CaseAuditor --> IntentClassifier
+  CaseAuditor --> IdentityResolver
+  CaseAuditor --> ResourceLinker
+  CaseAuditor --> StateReconstructor
+  CaseAuditor --> PolicyEngine
+  CaseAuditor --> StepPlanner
+  IdentityResolver --> DatasetRepository
+  ResourceLinker --> EvidenceIndex
+  ResourceLinker --> DatasetRepository
+  StateReconstructor --> EvidenceIndex
+  StateReconstructor --> RequestEpisodes
+  GeminiIntentClassifier --> GeminiClient
+  ImageLoader --> GeminiClient
+  PdfLoader --> GeminiClient
+  GeminiClient --> ResponseCache
+  GeminiClient --> UsageTracker
+</pre>
+  <h3>Method reference</h3>
+  <div class="row"><input type="text" id="apiFilter" class="filter" placeholder="Filter by class, method or keyword" aria-label="Filter methods"><span class="mono" id="apiCount" style="color:var(--muted)"></span></div>
+  <div class="frame" style="max-height:520px;overflow:auto"><table id="apiTable">
+    <thead><tr><th>Class / module</th><th>Signature</th><th>What it does</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <h3>Sequence for one case</h3>
+<pre class="mermaid">
+sequenceDiagram
+  participant M as main.py
+  participant A as CaseAuditor
+  participant C as IntentClassifier
+  participant I as IdentityResolver
+  participant L as ResourceLinker
+  participant S as StateReconstructor
+  participant P as PolicyEngine
+  participant SP as StepPlanner
+  M->>A: audit(request)
+  A->>C: intent(case_id) (pre-batched, cached)
+  alt not a deletion request
+    A-->>M: NOT_APPLICABLE, []
+  end
+  A->>I: resolve(email, audit_at)
+  I-->>A: SubjectProfile(user_id, emails, phones, hashes)
+  A->>L: link(profile, request)
+  L-->>A: resource refs
+  loop each resource
+    A->>S: state_at(ref, audit_at)
+    S-->>A: ResourceState + evidence_id
+    A->>P: evaluate(state)
+    P-->>A: Decision
+  end
+  A->>SP: plan(decisions, status)
+  SP-->>A: ordered steps
+  A-->>M: CaseResult
+</pre>
+</section>
+
+<!-- 07 -->
+<section id="pipeline">
+  <div class="eyebrow">07 · Pipeline</div>
+  <h2>Eight stages, traced on a real sample (case_11)</h2>
+  <p class="lede">case_11 claims COMPLETE. The evidence says otherwise. Click through the stages to see what each one consumes and produces.</p>
+  <div class="stepper" id="stepper" role="tablist"></div>
+  <div class="panel" id="stageBody"></div>
+</section>
+
+<!-- 08 -->
+<section id="scenarios">
+  <div class="eyebrow">08 · Data flow per case type</div>
+  <h2>Every case family, and where its decision is made</h2>
+  <p class="lede">Each case family takes the same pipeline, but the deciding moment happens at a different stage. Pick a family to see the path, the stage that decides it (highlighted), and the output shape. Sample references are real.</p>
+  <div class="scen-list" id="scenList"></div>
+  <div class="grid g2">
+    <div class="panel"><div class="row" style="justify-content:space-between"><h3 id="scenTitle"></h3><span id="scenStatus"></span></div><p id="scenDesc"></p><div class="lanes" id="scenLanes"></div></div>
+    <div class="panel"><h4>Expected output shape</h4><div class="frame"><table class="steps"><thead><tr><th>#</th><th>Phase</th><th>Operation</th><th>Resource</th><th>Evidence</th></tr></thead><tbody id="scenSteps"></tbody></table></div><p id="scenRef" class="mono" style="color:var(--muted)"></p></div>
+  </div>
+</section>
+
+<!-- 09 -->
+<section id="gemini">
+  <div class="eyebrow">09 · AI integration layer</div>
+  <h2>Gemini: two jobs, both cached</h2>
+  <div class="grid g2">
+    <div class="panel">
+      <span class="chip gem">Job 1 · Intent classification</span>
+      <p>518 request texts in several languages (English, Spanish, French and Japanese appear in the samples). Gemini returns one label per case. A keyword classifier runs alongside it, and any disagreement is printed for review.</p>
+<pre class="code">Prompt (llm/prompts/intent.md), batched ~50 per call:
+"For each request decide whether the person asks
+ to DELETE / ERASE their account or personal data.
+ Labels: DELETE, ACCESS, EXPORT, CORRECTION,
+ OPT_OUT, OTHER. Requests to verify or finish an
+ earlier deletion count as DELETE."
+response_schema:
+ [{case_id: str, intent: enum, confidence: number}]
+temperature: 0</pre>
+    </div>
+    <div class="panel">
+      <span class="chip gem">Job 2 · Image &amp; PDF extraction</span>
+      <p>11 console screenshots and 4 PDFs hold record rows (resource_id, system, status, identifiers). Each file is sent once. The JSON result joins the same <code>EvidenceIndex</code> as parsed SQL rows.</p>
+<pre class="code">Prompt (llm/prompts/media_extract.md):
+"List every record visible in this file. For each:
+ system_id, resource_id, data_category, status,
+ subject_reference, name, email, phone, email_hash,
+ timestamps. Use null for anything not shown.
+ Do not guess."
+PDF path: pypdf text first; Gemini only if empty.
+cache key: sha256(file bytes + prompt version)</pre>
+    </div>
+  </div>
+  <div class="callout"><b>Access:</b> Vertex AI with Application Default Credentials (<code>gcloud auth application-default login</code>), model <code>gemini-3.6-flash</code> on the <code>global</code> endpoint. No API key exists anywhere in the project. <b>Status:</b> the keyword half of Job 1 is built (M2); the Gemini calls come in M5.</div>
+  <div class="callout gem"><b>Gemini never decides a status or a step.</b> The policy engine and planner are plain Python, so a model mistake can only affect which records are seen, never how they are judged. Model mistakes are also visible in the cache and can be corrected by hand.</div>
+  <div class="panel">
+    <h3>Token and cost estimator</h3>
+    <p style="color:var(--muted)">Token figures below are planning estimates. Price fields are blank on purpose: enter the current Gemini price per million tokens for the model you pin.</p>
+    <div class="grid g4" id="calcInputs"></div>
+    <div class="grid g4" id="calcOut"></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="playground">
+  <div class="eyebrow">10 · Playground</div>
+  <h2>Explore the samples and test the output contract</h2>
+  <div class="panel">
+    <h3>Sample case explorer</h3>
+    <div class="row">
+      <select id="caseSel" aria-label="Sample case"></select>
+      <span id="caseChips" class="row"></span>
+    </div>
+    <p id="caseText" style="font-style:italic"></p>
+    <div class="frame"><table class="steps"><thead><tr><th>#</th><th>Phase</th><th>Operation</th><th>System</th><th>Resource</th><th>Evidence</th></tr></thead><tbody id="caseSteps"></tbody></table></div>
+    <div class="row"><button type="button" id="loadIntoValidator">Load into validator (shuffled)</button><span class="mono" style="color:var(--muted)">Loads this case’s answer in a scrambled order so you can watch the sorter fix it.</span></div>
+  </div>
+  <div class="panel">
+    <h3>steps_json validator, sorter and mini-evaluator</h3>
+    <p style="color:var(--muted)">This is the same logic <code>OutputValidator</code>, <code>StepPlanner._sort_key</code> and <code>Evaluator</code> will use. Paste any <code>steps_json</code> array.</p>
+    <div class="row">
+      <label for="valStatus" class="mono">status</label>
+      <select id="valStatus"><option>INCOMPLETE</option><option>COMPLETE</option><option>NOT_APPLICABLE</option></select>
+      <label for="valGold" class="mono">compare with</label>
+      <select id="valGold"><option value="">(no gold)</option></select>
+    </div>
+    <textarea id="valInput" spellcheck="false" aria-label="steps_json input"></textarea>
+    <div class="row"><button class="primary" type="button" id="btnValidate">Validate</button><button type="button" id="btnSort">Sort &amp; renumber to contract order</button></div>
+    <div class="grid g4" id="valMetrics"></div>
+    <div class="issues" id="valIssues"></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="tradeoffs">
+  <div class="eyebrow">11 · Trade-offs &amp; risks</div>
+  <h2>Decisions and what they cost</h2>
+  <div class="frame"><table>
+    <thead><tr><th>Decision</th><th>Choice</th><th>Gain</th><th>Cost</th></tr></thead>
+    <tbody id="tradeBody"></tbody>
+  </table></div>
+  <h3>Risks, ranked</h3>
+  <div class="frame"><table>
+    <thead><tr><th>#</th><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody id="riskBody"></tbody>
+  </table></div>
+</section>
+
+<!-- 12 -->
+<section id="questions">
+  <div class="eyebrow">12 · Open questions</div>
+  <h2>Things to settle with data before coding past M3</h2>
+  <div class="grid g2" id="qList"></div>
+</section>
+
+<!-- 13 -->
+<section id="preflight">
+  <div class="eyebrow">13 · Pre-flight checklist</div>
+  <h2>Before development starts</h2>
+  <p class="lede">Every item should be ticked or consciously waived before M1. Ticks are saved in this browser.</p>
+  <div class="row"><span class="mono" id="pfPct">0 of 0</span><div class="bar" style="flex:1"><i id="pfBar"></i></div><button type="button" id="pfReset">Clear ticks</button></div>
+  <div class="grid g2" id="pfGroups"></div>
+</section>
+
+<!-- 14 -->
+<section id="decisions">
+  <div class="eyebrow">14 · Decision log</div>
+  <h2>Decisions made while building, and why</h2>
+  <p class="lede">Each row is a choice that changes the output. “Your call” rows wait for a decision.</p>
+  <div class="frame"><table>
+    <thead><tr><th>#</th><th>Decision</th><th>Why</th><th>Effect</th><th>Status</th></tr></thead>
+    <tbody id="decBody"></tbody>
+  </table></div>
+</section>
+
+</main>
+</div>
+
+<script>
+const SAMPLES = [{"id":"case_01","status":"COMPLETE","reported":"COMPLETE","email":"amina.elmasri@gmail.com","audit_at":"2026-09-03T11:30:00Z","text":"Hi, I haven’t used this account in years and would like it closed. Please remove the profile and the personal details attached to it.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_001","evidence_54"]]},{"id":"case_02","status":"COMPLETE","reported":"PARTIALLY_COMPLETE","email":"mateo.rios@outlook.com","audit_at":"2026-09-04T15:00:00Z","text":"Intenté eliminar mi cuenta ayer, pero la página terminó mostrando un error. ¿Pueden comprobar si todavía queda algún dato y completar la eliminación si hace falta?","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_002","evidence_54"]]},{"id":"case_03","status":"COMPLETE","reported":"COMPLETE","email":"l.fontaine46@yahoo.com","audit_at":"2026-09-26T11:00:00Z","text":"Je demande la suppression définitive du compte associé à cette adresse e-mail. Veuillez examiner les identifiants actuels et antérieurs conformément à votre procédure de confidentialité. Merci de confirmer le résultat une fois la vérification terminée.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_7566","evidence_94"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_2016","evidence_94"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_9406","evidence_94"]]},{"id":"case_04","status":"COMPLETE","reported":"COMPLETE","email":"thandiwe.n@gmail.com","audit_at":"2026-09-07T10:20:00Z","text":"I’m deleting my account. You can keep anonymous statistics, but nothing in analytics should still point back to me.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_004","evidence_54"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_901","evidence_56"]]},{"id":"case_05","status":"INCOMPLETE","reported":"COMPLETE","email":"leila.haddad@yahoo.com","audit_at":"2026-09-08T13:40:00Z","text":"I deleted this account and received a confirmation, but the same email address is still recognized. Please remove any remaining copy of my profile.","steps":[["FINDING","REPORT_REMAINING_RECORD","account_service","account_005","evidence_54"],["REMEDIATION","DELETE_RECORD","account_service","account_005",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_005",""]]},{"id":"case_06","status":"INCOMPLETE","reported":"PARTIALLY_COMPLETE","email":"jonas.berg@outlook.com","audit_at":"2026-09-10T09:15:00Z","text":"My account page is gone, but my old profile still appears when I search for it. Can you remove that search result too?","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_001","evidence_57"],["REMEDIATION","DELETE_RECORD","search_service","search_001",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_006",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_001",""]]},{"id":"case_07","status":"INCOMPLETE","reported":"COMPLETE","email":"priya.raman@gmail.com","audit_at":"2026-09-12T08:00:00Z","text":"Please delete my account and the identity document I sent to support while resolving a delivery issue.","steps":[["FINDING","REPORT_REMAINING_RECORD","support_platform","support_001","evidence_58"],["REMEDIATION","DELETE_RECORD","support_platform","support_001",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_007",""],["VERIFICATION","VERIFY_RECORD_ABSENT","support_platform","support_001",""]]},{"id":"case_08","status":"INCOMPLETE","reported":"PARTIALLY_COMPLETE","email":"gabriel.costa@proton.me","audit_at":"2026-09-14T16:10:00Z","text":"I closed my account, but an old “download your data” link still works. Please delete that export file as well.","steps":[["FINDING","REPORT_REMAINING_RECORD","export_service","export_001","evidence_59"],["REMEDIATION","DELETE_RECORD","export_service","export_001",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_008",""],["VERIFICATION","VERIFY_RECORD_ABSENT","export_service","export_001",""]]},{"id":"case_09","status":"INCOMPLETE","reported":"NOT_STARTED","email":"k.appiah88@gmail.com","audit_at":"2026-09-16T09:00:00Z","text":"Please permanently delete the account associated with this email address. Please apply the correct treatment to records covered by the request. Please confirm when the review is complete.","steps":[["FINDING","REPORT_RESTORE_RISK","backup_service","backup_4978","evidence_93"],["REMEDIATION","BLOCK_RESTORE","backup_service","backup_4978",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_3960",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_4902",""],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_4978",""]]},{"id":"case_10","status":"INCOMPLETE","reported":"COMPLETE","email":"nadia.ionescu@yahoo.com","audit_at":"2026-09-18T12:25:00Z","text":"I used this Yahoo address before changing the email on my account. Please remove records linked to both the old and current addresses.","steps":[["FINDING","REPORT_REMAINING_RECORD","support_platform","support_002","evidence_61"],["REMEDIATION","DELETE_RECORD","support_platform","support_002",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_010",""],["VERIFICATION","VERIFY_RECORD_ABSENT","support_platform","support_002",""]]},{"id":"case_11","status":"INCOMPLETE","reported":"COMPLETE","email":"novak.tomasz@icloud.com","audit_at":"2026-10-01T12:00:00Z","text":"I would like the account associated with this address to be erased. Please handle any copies that fall within the scope of the deletion request. Please contact me if you need information to verify the request.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_052","evidence_03"],["FINDING","REPORT_EXPOSED_PII","analytics_platform","analytics_2034","evidence_03"],["FINDING","REPORT_EXPOSED_PII","support_platform","support_864","evidence_03"],["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_9522","evidence_03"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_9522",""],["REMEDIATION","DELETE_RECORD","search_service","search_052",""],["REMEDIATION","REDACT_RECORD","support_platform","support_864",""],["REMEDIATION","ANONYMIZE_RECORD","analytics_platform","analytics_2034",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4248",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_052",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_9394",""],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_864",""],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_2034",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_9522",""]]},{"id":"case_12","status":"INCOMPLETE","reported":"COMPLETE","email":"minjun.kim@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"I changed the email on this account before deleting it. Please check that nothing tied to the old address was left behind, even in systems that do not display the email.","steps":[["FINDING","REPORT_REMAINING_RECORD","analytics_platform","analytics_9914","evidence_01"],["REMEDIATION","DELETE_RECORD","analytics_platform","analytics_9914",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_9797",""],["VERIFICATION","VERIFY_RECORD_ABSENT","analytics_platform","analytics_9914",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_2945",""]]},{"id":"case_13","status":"INCOMPLETE","reported":"NOT_STARTED","email":"noor-khalil@proton.me","audit_at":"2026-10-01T12:00:00Z","text":"Please close my account and process the associated personal-data deletion. Please check the records connected to the account before confirming completion. Please contact me if you need information to verify the request.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_1308","evidence_03"],["FINDING","REPORT_REMAINING_RECORD","support_platform","support_4218","evidence_03"],["REMEDIATION","DELETE_RECORD","search_service","search_1308",""],["REMEDIATION","DELETE_RECORD","support_platform","support_4218",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_9335",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_1308",""],["VERIFICATION","VERIFY_RECORD_ABSENT","support_platform","support_4218",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_4816",""]]},{"id":"case_14","status":"INCOMPLETE","reported":"COMPLETE","email":"y.tanaka32@gmail.com","audit_at":"2026-10-01T12:00:00Z","text":"このメールアドレスに関連するアカウントの完全な削除を依頼します。 プライバシー手続きに従い、現在および過去の識別情報を確認してください。 確認が完了したら結果をお知らせください。","steps":[["FINDING","REPORT_RESTORE_RISK","backup_service","backup_3870","evidence_03"],["REMEDIATION","BLOCK_RESTORE","backup_service","backup_3870",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_3677",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_987",""],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_3870",""]]},{"id":"case_15","status":"INCOMPLETE","reported":"COMPLETE","email":"lucia-torres@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"I disconnected my account last week, but one of the integrations still seems active. Close the account completely and make sure it can no longer send my data to other systems.","steps":[["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_9846","evidence_01"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_9846",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4745",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_1596",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_9846",""]]},{"id":"case_16","status":"INCOMPLETE","reported":"NOT_STARTED","email":"diya.k4436@outlook.com","audit_at":"2026-09-21T10:00:00Z","text":"Please treat this message as a request for permanent account deletion. Please include information linked through current or earlier account identifiers. A short confirmation when the process is complete is sufficient.","steps":[["FINDING","REPORT_REMAINING_RECORD","account_service","account_994","evidence_05"],["FINDING","REPORT_REMAINING_RECORD","search_service","search_1007","evidence_05"],["REMEDIATION","DELETE_RECORD","account_service","account_994",""],["REMEDIATION","DELETE_RECORD","search_service","search_1007",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_994",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_1007",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_9528",""]]},{"id":"case_17","status":"INCOMPLETE","reported":"NOT_STARTED","email":"leonie.g9352@outlook.com","audit_at":"2026-09-15T12:00:00Z","text":"I want to close this account permanently. You may retain backups if required, but they must not be able to restore my personal profile.","steps":[["FINDING","REPORT_RESTORE_RISK","backup_service","backup_3245","evidence_01"],["REMEDIATION","BLOCK_RESTORE","backup_service","backup_3245",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4092",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_1797",""],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_3245",""]]},{"id":"case_18","status":"INCOMPLETE","reported":"COMPLETE","email":"mori.ren@gmail.com","audit_at":"2026-09-26T11:00:00Z","text":"I am asking you to remove my account and the personal information linked to it. Please review any identifiers connected to this account as part of the request. Please let me know once the request has been reviewed.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_4013","evidence_94"],["FINDING","REPORT_EXPOSED_PII","analytics_platform","analytics_037","evidence_94"],["FINDING","REPORT_EXPOSED_PII","support_platform","support_5569","evidence_94"],["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_4890","evidence_94"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_4890",""],["REMEDIATION","DELETE_RECORD","search_service","search_4013",""],["REMEDIATION","REDACT_RECORD","support_platform","support_5569",""],["REMEDIATION","ANONYMIZE_RECORD","analytics_platform","analytics_037",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_5521",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_4013",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_6645",""],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_5569",""],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_037",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_4890",""]]},{"id":"case_19","status":"INCOMPLETE","reported":"PARTIALLY_COMPLETE","email":"e.varga90@yahoo.com","audit_at":"2026-09-15T12:00:00Z","text":"Please remove my profile and clean my personal details out of earlier support conversations. Some of those messages also relate to another customer, so the conversation itself may need to stay.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_6083","evidence_01"],["FINDING","REPORT_EXPOSED_PII","support_platform","support_9553","evidence_01"],["REMEDIATION","DELETE_RECORD","search_service","search_6083",""],["REMEDIATION","REDACT_RECORD","support_platform","support_9553",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_9102",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_6083",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_6793",""],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_9553",""]]},{"id":"case_20","status":"INCOMPLETE","reported":"NOT_STARTED","email":"akosua.gyasi@gmail.com","audit_at":"2026-09-26T11:00:00Z","text":"Please treat this message as a request for permanent account deletion. Please check the records connected to the account before confirming completion. Please send a confirmation after the process finishes.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_4262","evidence_94"],["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_1770","evidence_94"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_1770",""],["REMEDIATION","DELETE_RECORD","search_service","search_4262",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_5037",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_4262",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_5569",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_1770",""]]},{"id":"case_21","status":"COMPLETE","reported":"COMPLETE","email":"amara-okeke@proton.me","audit_at":"2026-09-15T12:00:00Z","text":"I deleted my account and received the confirmation email. Could you verify that the profile is gone and that anything retained for security is limited to what is required?","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_6440","evidence_92"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_3737","evidence_92"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_5335","evidence_92"]]},{"id":"case_22","status":"INCOMPLETE","reported":"COMPLETE","email":"seoyeon-han@gmail.com","audit_at":"2026-09-21T10:00:00Z","text":"Please erase the account linked to this email address. Please apply the correct treatment to records covered by the request. Please send a confirmation after the process finishes.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_8911","evidence_05"],["FINDING","REPORT_EXPOSED_PII","analytics_platform","analytics_4440","evidence_05"],["REMEDIATION","DELETE_RECORD","search_service","search_8911",""],["REMEDIATION","ANONYMIZE_RECORD","analytics_platform","analytics_4440",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4990",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_8911",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_3482",""],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_4440",""]]},{"id":"case_23","status":"INCOMPLETE","reported":"NOT_STARTED","email":"thandiwe.m6866@zoho.com","audit_at":"2026-09-15T12:00:00Z","text":"Please delete this account, including the downloadable archive I requested earlier and any search result that still points to me. Security records can stay if policy requires them.","steps":[["FINDING","REPORT_REMAINING_RECORD","export_service","export_7364","evidence_92"],["FINDING","REPORT_REMAINING_RECORD","search_service","search_898","evidence_92"],["REMEDIATION","DELETE_RECORD","export_service","export_7364",""],["REMEDIATION","DELETE_RECORD","search_service","search_898",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_410",""],["VERIFICATION","VERIFY_RECORD_ABSENT","export_service","export_7364",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_898",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_4128",""]]},{"id":"case_24","status":"INCOMPLETE","reported":"COMPLETE","email":"keiko.nakamura@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"I was told that deletion was complete, but the account and its search result can still be found. Please investigate and finish the deletion.","steps":[["FINDING","REPORT_REMAINING_RECORD","account_service","account_5334","evidence_92"],["FINDING","REPORT_REMAINING_RECORD","search_service","search_5577","evidence_92"],["REMEDIATION","DELETE_RECORD","account_service","account_5334",""],["REMEDIATION","DELETE_RECORD","search_service","search_5577",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_5334",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_5577",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_7095",""]]},{"id":"case_25","status":"COMPLETE","reported":"NOT_STARTED","email":"s.yoon04@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"The privacy page still says my request failed. Please inspect the actual systems and tell me whether the account and identifiable analytics data have already been removed.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_3136","evidence_92"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_451","evidence_92"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_1895","evidence_92"]]},{"id":"case_26","status":"COMPLETE","reported":"NOT_STARTED","email":"almeida.mariana@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"I found an old report saying my account still existed. Please check the latest state and confirm that the profile is gone and that remaining records cannot identify me.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_5684","evidence_92"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_5416","evidence_92"],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_4715","evidence_92"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_4566","evidence_92"],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_6244","evidence_92"],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_3120","evidence_92"]]},{"id":"case_27","status":"COMPLETE","reported":"COMPLETE","email":"ananya-nair@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"Please audit the deletion as it stood when my request was reviewed. I want confirmation that the account was fully removed at that point.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_3866","evidence_92"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_3830","evidence_92"],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_4707","evidence_92"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_4574","evidence_92"],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_2295","evidence_92"],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_5970","evidence_92"]]},{"id":"case_28","status":"COMPLETE","reported":"NOT_STARTED","email":"smartinez6461@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"Can you verify that my account was deleted? A search result with a similar email belongs to someone else, so please do not treat that record as mine.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_5482","evidence_92"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_9265","evidence_92"],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_2351","evidence_92"],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_6077","evidence_92"],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_2337","evidence_92"],["VERIFICATION","VERIFY_RESTORE_BLOCKED","backup_service","backup_838","evidence_92"]]},{"id":"case_29","status":"INCOMPLETE","reported":"NOT_STARTED","email":"noah.f438085@outlook.com","audit_at":"2026-09-15T12:00:00Z","text":"I used a different email on this account before changing it. Please remove records under both addresses and switch off any integration that could copy them back into search or analytics.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_1993","evidence_92"],["FINDING","REPORT_EXPOSED_PII","analytics_platform","analytics_5208","evidence_92"],["FINDING","REPORT_EXPOSED_PII","support_platform","support_5281","evidence_92"],["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_3827","evidence_92"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_3827",""],["REMEDIATION","DELETE_RECORD","search_service","search_1993",""],["REMEDIATION","REDACT_RECORD","support_platform","support_5281",""],["REMEDIATION","ANONYMIZE_RECORD","analytics_platform","analytics_5208",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_7012",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_1993",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_3954",""],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_5281",""],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_5208",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_3827",""]]},{"id":"case_30","status":"INCOMPLETE","reported":"COMPLETE","email":"camille.bernard86@outlook.com","audit_at":"2026-09-15T12:00:00Z","text":"I was told the account had been deleted, but I can still find traces in search, support, and analytics. Please handle them and disable any synchronization that could recreate them.","steps":[["FINDING","REPORT_REMAINING_RECORD","search_service","search_9359","evidence_92"],["FINDING","REPORT_EXPOSED_PII","analytics_platform","analytics_3697","evidence_92"],["FINDING","REPORT_EXPOSED_PII","support_platform","support_6477","evidence_92"],["FINDING","REPORT_ACTIVE_DATA_FLOW","integration_service","data_flow_8524","evidence_92"],["REMEDIATION","DISABLE_DATA_FLOW","integration_service","data_flow_8524",""],["REMEDIATION","DELETE_RECORD","search_service","search_9359",""],["REMEDIATION","REDACT_RECORD","support_platform","support_6477",""],["REMEDIATION","ANONYMIZE_RECORD","analytics_platform","analytics_3697",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4163",""],["VERIFICATION","VERIFY_RECORD_ABSENT","search_service","search_9359",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_1707",""],["VERIFICATION","VERIFY_RECORD_REDACTED","support_platform","support_6477",""],["VERIFICATION","VERIFY_RECORD_ANONYMIZED","analytics_platform","analytics_3697",""],["VERIFICATION","VERIFY_DATA_FLOW_DISABLED","integration_service","data_flow_8524",""]]},{"id":"case_31","status":"COMPLETE","reported":"COMPLETE","email":"a.eze08@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"I no longer need this account. Please remove my name and contact details, but keeping an internal deleted-account reference is fine if other required records still depend on it.","steps":[["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_4857","evidence_51"],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_6909","evidence_51"],["VERIFICATION","VERIFY_RECORD_REDACTED","identity_service","tombstone_440","evidence_51"]]},{"id":"case_32","status":"INCOMPLETE","reported":"PARTIALLY_COMPLETE","email":"addo.kofi@gmail.com","audit_at":"2026-09-15T12:00:00Z","text":"The account itself is gone, but an internal deleted-account record still shows my personal details. Please keep only the reference needed for retained records and remove the rest.","steps":[["FINDING","REPORT_EXPOSED_PII","identity_service","tombstone_9178","evidence_51"],["REMEDIATION","REDACT_RECORD","identity_service","tombstone_9178",""],["VERIFICATION","VERIFY_RECORD_ABSENT","account_service","account_8858",""],["VERIFICATION","VERIFY_RECORD_PRESENT","security_service","audit_record_7068",""],["VERIFICATION","VERIFY_RECORD_REDACTED","identity_service","tombstone_9178",""]]}];
+
+const $ = s => document.querySelector(s);
+const el = (tag, attrs = {}, html = "") => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (html) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ---------- contract constants ---------- */
+const PHASES = ["FINDING", "REMEDIATION", "VERIFICATION"];
+const OPS = [
+  ["REPORT_REMAINING_RECORD", "FINDING", "PRESENT"], ["REPORT_EXPOSED_PII", "FINDING", "PRESENT"],
+  ["REPORT_ACTIVE_DATA_FLOW", "FINDING", "ACTIVE"], ["REPORT_RESTORE_RISK", "FINDING", "ACTIVE"],
+  ["DISABLE_DATA_FLOW", "REMEDIATION", "DISABLED"], ["BLOCK_RESTORE", "REMEDIATION", "BLOCKED"],
+  ["DELETE_RECORD", "REMEDIATION", "ABSENT"], ["REDACT_RECORD", "REMEDIATION", "REDACTED"],
+  ["ANONYMIZE_RECORD", "REMEDIATION", "ANONYMIZED"],
+  ["VERIFY_RECORD_ABSENT", "VERIFICATION", "ABSENT"], ["VERIFY_RECORD_PRESENT", "VERIFICATION", "PRESENT"],
+  ["VERIFY_RECORD_REDACTED", "VERIFICATION", "REDACTED"], ["VERIFY_RECORD_ANONYMIZED", "VERIFICATION", "ANONYMIZED"],
+  ["VERIFY_DATA_FLOW_DISABLED", "VERIFICATION", "DISABLED"], ["VERIFY_RESTORE_BLOCKED", "VERIFICATION", "BLOCKED"]
+];
+const OP_INDEX = Object.fromEntries(OPS.map((o, i) => [o[0], i]));
+const OP_META = Object.fromEntries(OPS.map(o => [o[0], { phase: o[1], state: o[2] }]));
+const sortKey = s => [PHASES.indexOf(s.phase), OP_INDEX[s.operation] ?? 99, s.system_id || "", s.resource_id || ""];
+const cmp = (a, b) => { const x = sortKey(a), y = sortKey(b); for (let i = 0; i < x.length; i++) { if (x[i] < y[i]) return -1; if (x[i] > y[i]) return 1; } return 0; };
+const toStep = (a, i) => ({ step_no: i + 1, phase: a[0], system_id: a[2], resource_id: a[3], operation: a[1], state: OP_META[a[1]].state, evidence_id: a[4] });
+const phaseCls = p => p === "FINDING" ? "find" : p === "REMEDIATION" ? "rem" : "ver";
+const statusChip = s => `<span class="chip ${s === "COMPLETE" ? "ver" : s === "INCOMPLETE" ? "find" : "acc"}">${s}</span>`;
+
+/* ---------- nav highlight ---------- */
+(() => {
+  const links = [...document.querySelectorAll("nav.index a")];
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(l => l.classList.toggle("on", l.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll("main section").forEach(s => io.observe(s));
+})();
+
+/* ---------- 02 roadmap ---------- */
+const ROADMAP = [
+  { id: "M0", st: "done", t: "Setup", out: "Project skeleton, venv, key handling", exit: "python code/main.py --help runs", tasks: [
+    ["Create package layout", ["Create code/{loaders,core,llm,output,evaluation} with __init__.py", "Add config.py with Settings (dataset_dir, out_path, model, flags)", "Add main.py with argparse subcommands: run, eval, validate, explain"]],
+    ["Environment", ["python -m venv .venv; test google-genai install on 3.14, fall back to 3.12 if wheels fail", "requirements.txt: google-genai, pypdf, python-dotenv (pinned)", "Load GEMINI_API_KEY via dotenv; confirm .env is in .gitignore"]],
+    ["Offline switch", ["Add --no-llm flag that forces keyword intent + cached media extraction", "Make every Gemini call go through one client so the switch is one place"]] ] },
+  { id: "M1", st: "done", t: "Loaders & evidence index", out: "All 94 evidence files as normalized observations", exit: "Every file yields > 0 observations or is flagged", tasks: [
+    ["DatasetRepository", ["Parse the 7 CSVs into dataclasses, timestamps to UTC datetime", "Build maps: identity_by_email, audit_by_user, activity_by_resource, rule_by_category, manifest_by_file"]],
+    ["SqlLoader", ["executescript each .sql into sqlite3 ':memory:'", "List tables, dump rows, keep table name (primary / replica / failover)", "Map columns to Observation fields (resource_id, subject_reference, email, phone, email_hash, status)"]],
+    ["Json / Log / Text loaders", ["JSON: flatten nested records, keep path for traceability", "Logs: regex out timestamp, system, resource_id, emails, user_ids, status words", "Text handover: split pipe-delimited rows (time | system | resource | category | state | identifier)"]],
+    ["EvidenceIndex", ["Index by resource_id, by each identifier value, by file_id", "Expose cutoff-aware queries (captured_at <= audit_at)", "Print a per-file observation count report"]] ] },
+  { id: "M2", st: "review", t: "Identity & linking", out: "Each case → user_id → identifiers → resources", exit: "Sample resource sets match sample_output.csv (now 103/111 found, 1 extra; 3 of the 8 misses exist in no file)", tasks: [
+    ["IdentityResolver", ["Match email against user_identities.email, then user_audit_log old_value (field_name=email)", "Collect all historical emails/phones/names up to the cutoff", "email_hash == sha256(lower(email)) confirmed, so old emails are hashed too"]],
+    ["KeywordIntentClassifier (pulled forward from M5)", ["Refusal cues first, then deletion cues in 6 languages, then the topic of a non-deletion request", "Result: exactly the 10 non-deletion requests in the 518 (case_533–542), none of the 32 samples", "Non-deletion requests are kept out of batch matching"]],
+    ["RequestEpisodes", ["Resolve every request to its person", "A request only uses evidence after that person's previous audit_at (repeat requesters: case_61→case_07, case_46→case_17)"]],
+    ["ResourceLinker", ["Evidence identifier matches (email, past email, phone, hash, user_id)", "LINK_RESOURCE_IDENTITY catalog rows naming the person", "Parent links in both directions (search_001 ↔ account_006)", "Names are never used to link: the data plants near-namesakes"]],
+    ["WorkflowWindowMatcher", ["Records with no identifiers left: match deletion_worker activity in the window around reported_at", "Eliminate: owned by someone else, type already proven, wording family differs, claim mismatch on the primary account", "Pair k-to-k ties in a fixed order and mark them as paired (guess)"]],
+    ["Linking check", ["link-check diffs found vs expected resources and says why each one was missed", "Reports how many links are paired guesses and how many records stay ambiguous"]] ] },
+  { id: "M3", st: "done", t: "State & policy", out: "Per-resource state at audit_at + required treatment", exit: "decision-check: status 32/32, finding 103/103, verification 103/103, evidence 70/70", tasks: [
+    ["StateReconstructor", ["Readings from citable evidence inside the episode; latest wins", "Replica copy beats a 'gone' reading (case_05)", "Absence by omission from complete store listings (case_01 evidence_54, case_31 evidence_51)", "Connector / restore checks only as last resort; otherwise UNKNOWN"]],
+    ["PolicyEngine", ["Treatment: stated category → workflow's attempted action → resource type", "UNKNOWN is never a finding", "Flows and backups handled here (no separate RiskDetector)"]],
+    ["Normalizer upgrades", ["Lookup keys kept apart from a record's own identifiers", "More presence and restore spellings (PII scans, read_completed, deletion_block, decision)", "PDFs with upload history tagged SUPPORT_ATTACHMENT"]] ] },
+  { id: "M4", st: "done", t: "Steps, output & sample eval", out: "output.csv for 518 cases + evaluator", exit: "validator 0 issues; samples status 32/32, step F1 97.6%, sequence 25/32", tasks: [
+    ["StepPlanner", ["INCOMPLETE: cited findings → remediations → verification for every relevant resource", "COMPLETE: cited verifications; activity_id as fallback citation", "Sort by phase → operation order → system_id → resource_id; renumber from 1"]],
+    ["CaseAuditor + explain", ["One call per case returns the result and an audit trail", "main.py explain case_11 prints every intermediate result"]],
+    ["OutputWriter + OutputValidator", ["Rows in case number order, compact JSON, byte-identical reruns", "Validator rereads the file: rows, order, schema, op/state pairs, evidence rules, cutoff"]],
+    ["Evaluator", ["Status, sequence, positional step match, order-free precision/recall/F1, per-field agreement", "The 7 imperfect samples are all linking misses (3 untraceable, 4 ties/pairing)"]] ] },
+  { id: "M5", t: "Gemini layer", out: "Intent classifier + media extraction, cached", exit: "NOT_APPLICABLE set looks right; media facts in index", tasks: [
+    ["GeminiClient", ["generate_json(prompt, schema, parts) with temperature 0 and response schema", "ResponseCache keyed by sha256(input + prompt version)", "UsageTracker records usage_metadata per call to usage.jsonl", "Retry with exponential backoff; raise to caller after N tries"]],
+    ["Intent", ["Batch ~50 requests per call", "Ensemble with keyword classifier; print disagreements", "Use CLASSIFY_REQUEST activity rows as a tie-breaker"]],
+    ["Media", ["PDF: pypdf text first, Gemini only if empty", "PNG: one call per image, strict JSON schema", "Spot-check every extracted file against the image by eye"]] ] },
+  { id: "M6", t: "Full run & reports", out: "output.csv + evaluation_report.md + usage_report.md", exit: "Validator passes with zero issues", tasks: [
+    ["Full run", ["Run all 518 cases; write solution/output.csv", "Check status distribution against reported_status mix for sanity"]],
+    ["Validation", ["518 rows, sorted, case_id set equals input", "Valid JSON; allowed phase/op/state only; consecutive step_no", "Empty evidence on INCOMPLETE remediation/verification; no evidence after audit_at"]],
+    ["Reports", ["evaluation_report.md: metrics, 3+ custom cases, failures and fixes", "usage_report.md: provider, model, calls, tokens in/out, avg per request, cost"]] ] },
+  { id: "M7", t: "Package & interview", out: "code.zip, README, log.txt, talking points", exit: "Fresh clone reproduces output.csv", tasks: [
+    ["Package", ["README: setup, .env.example, commands, architecture summary", "code.zip excludes dataset/, .venv, .env, caches unless intentionally kept"]],
+    ["Verify", ["Fresh clone + --no-llm run reproduces output.csv byte for byte"]],
+    ["Interview prep", ["Why rules-first; how audit_at state works; ordering logic; metrics; cost"]] ] }
+];
+function renderRoad() {
+  const done = store.get("gd_road", {});
+  const host = $("#road"); host.innerHTML = "";
+  ROADMAP.forEach(m => {
+    const d = el("details", { class: "ms" }); if (m.st === "review") d.open = true;
+    const total = m.tasks.length, n = m.tasks.filter((_, i) => done[m.id + i]).length;
+    const stChip = m.st === "done" ? '<span class="chip ver">done</span>' : m.st === "review" ? '<span class="chip warn">in review</span>' : '';
+    d.innerHTML = `<summary><span class="tag">${m.id}</span><span><h3>${esc(m.t)} ${stChip}</h3><span class="meta">${esc(m.out)} · exit: ${esc(m.exit)}</span></span><span class="mono meta">${n}/${total}</span></summary>`;
+    const body = el("div", { class: "body" });
+    m.tasks.forEach(([name, steps], i) => {
+      const t = el("div", { class: "task" });
+      t.innerHTML = `<label class="chk"><input type="checkbox" id="rd_${m.id}_${i}" ${done[m.id + i] ? "checked" : ""}><span><b>${esc(name)}</b></span></label><ol>${steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>`;
+      t.querySelector("input").addEventListener("change", e => { const st = store.get("gd_road", {}); st[m.id + i] = e.target.checked; store.set("gd_road", st); renderRoadPct(); d.querySelector("summary .mono").textContent = m.tasks.filter((_, j) => st[m.id + j]).length + "/" + total; });
+      body.appendChild(t);
+    });
+    d.appendChild(body); host.appendChild(d);
+  });
+  renderRoadPct();
+}
+function renderRoadPct() {
+  const done = store.get("gd_road", {}); let tot = 0, n = 0;
+  ROADMAP.forEach(m => m.tasks.forEach((_, i) => { tot++; if (done[m.id + i]) n++; }));
+  const p = Math.round(100 * n / tot); $("#roadPct").textContent = `${p}% done (${n}/${tot} tasks)`; $("#roadBar").style.width = p + "%";
+}
+$("#roadReset").addEventListener("click", () => { store.set("gd_road", {}); renderRoad(); });
+renderRoad();
+
+/* ---------- 03 architecture ---------- */
+const NODES = [
+  { id: "csv", x: 20, y: 70, w: 150, h: 54, l: "dataset/*.csv", s: "requests, identities, audit,", s2: "activity, rules, manifest", c: "io", lane: 0 },
+  { id: "evid", x: 20, y: 250, w: 150, h: 54, l: "dataset/evidence/", s: "sql · json · log · txt", s2: "pdf · png", c: "io", lane: 0 },
+  { id: "repo", x: 210, y: 70, w: 160, h: 46, l: "DatasetRepository", s: "typed CSV records", c: "", lane: 1 },
+  { id: "loaders", x: 210, y: 230, w: 160, h: 54, l: "EvidenceLoaders", s: "Sql/Json/Log/Text", s2: "Pdf/Image → raw records", c: "", lane: 1 },
+  { id: "normalizer", x: 210, y: 322, w: 160, h: 46, l: "RecordNormalizer", s: "raw record → Observation", c: "", lane: 1 },
+  { id: "index", x: 410, y: 230, w: 150, h: 46, l: "EvidenceIndex", s: "by resource / identifier / time", c: "", lane: 2 },
+  { id: "cache", x: 410, y: 420, w: 150, h: 46, l: "ResponseCache", s: "llm/cache/*.json", c: "", lane: 2 },
+  { id: "intent", x: 600, y: 12, w: 170, h: 36, l: "IntentClassifier", s: "keyword now, Gemini in M5", c: "core", lane: 3 },
+  { id: "identity", x: 600, y: 56, w: 170, h: 36, l: "IdentityResolver", s: "email → SubjectProfile", c: "core", lane: 3 },
+  { id: "episodes", x: 600, y: 100, w: 170, h: 36, l: "RequestEpisodes", s: "repeat requesters", c: "core", lane: 3 },
+  { id: "matcher", x: 600, y: 144, w: 170, h: 36, l: "WorkflowWindowMatcher", s: "batch window matching", c: "core", lane: 3 },
+  { id: "linker", x: 600, y: 188, w: 170, h: 36, l: "ResourceLinker", s: "profile → resources", c: "core", lane: 3 },
+  { id: "state", x: 600, y: 232, w: 170, h: 36, l: "StateReconstructor", s: "state at audit_at", c: "core", lane: 3 },
+  { id: "policy", x: 600, y: 276, w: 170, h: 36, l: "PolicyEngine", s: "rules → Decision", c: "core", lane: 3 },
+  { id: "risk", x: 600, y: 320, w: 170, h: 36, l: "(flows & backups)", s: "inside state + policy", c: "core", lane: 3 },
+  { id: "planner", x: 600, y: 364, w: 170, h: 36, l: "StepPlanner", s: "ordered steps_json", c: "core", lane: 3 },
+  { id: "auditor", x: 600, y: 424, w: 170, h: 46, l: "CaseAuditor", s: "orchestrates per case", c: "", lane: 3 },
+  { id: "writer", x: 810, y: 160, w: 170, h: 46, l: "OutputWriter", s: "→ output.csv", c: "", lane: 4 },
+  { id: "validator", x: 810, y: 230, w: 170, h: 46, l: "OutputValidator", s: "contract checks", c: "", lane: 4 },
+  { id: "evaluator", x: 810, y: 300, w: 170, h: 46, l: "Evaluator", s: "→ evaluation_report.md", c: "", lane: 4 },
+  { id: "usage", x: 810, y: 420, w: 170, h: 46, l: "UsageTracker", s: "→ usage_report.md", c: "", lane: 4 },
+  { id: "gemini", x: 210, y: 420, w: 160, h: 50, l: "Gemini API", s: "GeminiClient · JSON schema", c: "gem", lane: 1 }
+];
+const EDGES = [["csv", "repo"], ["evid", "loaders"], ["loaders", "normalizer"], ["normalizer", "index"], ["repo", "identity"], ["repo", "linker"], ["index", "linker"], ["index", "matcher"], ["repo", "episodes"], ["index", "state"], ["index", "risk"], ["repo", "policy"], ["auditor", "planner"], ["planner", "writer"], ["writer", "validator"], ["writer", "evaluator"], ["gemini", "usage"], ["gemini", "cache"], ["repo", "intent"],
+  ["loaders", "gemini", "gem"], ["intent", "gemini", "gem"]];
+const NODE_INFO = {
+  state: ["Reasoning", "Latest citable evidence inside the episode wins. A replica copy beats a 'gone' reading. A complete store listing that omits the record proves it is gone. Connector and restore checks are a last resort. Otherwise UNKNOWN.", "ResourceLink, request", "ResourceState + evidence_id"],
+  policy: ["Reasoning", "Treatment from the evidence-stated category, then the workflow's attempted action, then the resource type. Builds the Decision: finding (or none), remediation, verification.", "ResourceState", "Decision"],
+  risk: ["Reasoning", "No separate class. Flows (data_flow_*) and backups (backup_*) are linked like any record; their enabled / restore_allowed readings become REPORT_ACTIVE_DATA_FLOW and REPORT_RESTORE_RISK findings.", "—", "—"],
+  planner: ["Reasoning", "INCOMPLETE: cited findings, remediations, then a verification for every relevant resource. COMPLETE: cited verifications. Sorted by phase → operation → system → resource, numbered from 1.", "Decision[]", "status, Step[]"],
+  auditor: ["Reasoning", "Runs intent → identity → links → state → policy → planner for one case and keeps an AuditTrail for explain.", "Request", "CaseResult, AuditTrail"],
+  writer: ["Output", "Rows in case number order, compact JSON with fixed key order. Two runs give byte-identical files.", "CaseResult[]", "output.csv"],
+  validator: ["Output", "Rereads output.csv: 518 rows, order, schema, op/state pairs, numbering, evidence rules, no file captured after audit_at. Current result: 0 issues.", "output.csv", "issues"],
+  evaluator: ["Output", "Status, sequence, positional step match, order-free precision/recall/F1 and per-field agreement against the samples. Current: status 32/32, F1 97.6%.", "pred + gold", "Metrics"],
+  csv: ["Input", "The seven participant-facing CSVs. Only deletion_requests.csv needs predictions; the rest is context.", "—", "Raw rows"],
+  evid: ["Input", "94 files listed in evidence_files.csv. The manifest gives path and captured_at, never the case.", "—", "Files"],
+  repo: ["Ingestion", "Parses CSVs into dataclasses with UTC datetimes and builds lookup maps.", "dataset/*.csv", "Request, Identity, AuditEntry, Activity, Rule, EvidenceFile"],
+  loaders: ["Ingestion", "One loader per format. Loaders only flatten their format into field/value pairs (RawEvidenceRecord); they do not interpret. SqlLoader runs each .sql in sqlite3 :memory:. PdfLoader uses pypdf. ImageLoader (M5) will use Gemini, cached. Built: 3,160 observations from 94 files; 14 files yield none (11 PNG, 2 PDF, 1 empty SQL).", "EvidenceFile + path", "RawEvidenceRecord[]"],
+  normalizer: ["Ingestion", "One shared interpreter of raw records: finds resource_id, system, category, presence (PRESENT / ABSENT / UNSTATED), status word and identifiers. Kept in one place so six loaders cannot drift into six meanings of “deleted”.", "RawEvidenceRecord", "Observation | None"],
+  episodes: ["Reasoning", "Some people file several requests. Each request only looks at evidence after the same person's previous audit_at. This removed all 3 wrong links in the samples (object_19, tombstone_17, account_6523).", "all requests", "starts_after(request)"],
+  matcher: ["Reasoning", "Deleted or anonymized records name nobody. This matches them to requests through deletion_worker activity near reported_at, by elimination, then pairs exact k-to-k ties in a fixed order (marked as guesses). 171 records paired, 35 still ambiguous across all requests.", "deletion requests, index, activity", "matched activities per case"],
+  index: ["Knowledge", "In-memory index over all observations. Every query takes a cutoff so evidence after audit_at is never seen.", "Observation[]", "by_resource, by_identifier, file()"],
+  cache: ["Knowledge", "JSON files keyed by sha256 of the input and prompt version. Makes reruns free and deterministic.", "model responses", "cached JSON"],
+  intent: ["Reasoning", "Labels each request DELETE / ACCESS / EXPORT / CORRECTION / OPT_OUT / OTHER. Non-DELETE ⇒ NOT_APPLICABLE. The keyword classifier is built and finds exactly the 10 non-deletion requests; Gemini joins as a cross-check in M5.", "request_text", "IntentResult per case"],
+  identity: ["Reasoning", "Current email via user_identities, historical via user_audit_log old_value. Collects every identifier valid before audit_at.", "email, audit_at", "SubjectProfile"],
+  linker: ["Reasoning", "Finds resources through evidence identifier matches, LINK_RESOURCE_IDENTITY catalog rows, parent links and the matcher. Each link keeps its reasons and proof ids for explain.", "SubjectProfile, request", "ResourceLink[]"],
+  usage: ["Output", "Aggregates usage.jsonl from the final run into usage_report.md.", "usage records", "Markdown report"],
+  gemini: ["AI layer", "Thin client over google-genai on Vertex AI with Application Default Credentials (no API key). Model gemini-3.6-flash, region global. temperature 0, JSON response schema, retries, cache, usage tracking.", "prompt + parts", "JSON + usage"]
+};
+function renderArch() {
+  const W = 1000, H = 490, NS = "http://www.w3.org/2000/svg";
+  const lanes = [["INPUTS", 10, 170], ["INGESTION", 200, 180], ["KNOWLEDGE", 400, 170], ["REASONING CORE", 590, 190], ["OUTPUT", 800, 190]];
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="${NS}" role="img" aria-label="System architecture diagram"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>`;
+  lanes.forEach(([n, x, w]) => { s += `<rect class="lane" x="${x}" y="4" width="${w}" height="${H - 8}" rx="8"/><text class="lanelabel" x="${x + 10}" y="${H - 12}">${n}</text>`; });
+  const N = Object.fromEntries(NODES.map(n => [n.id, n]));
+  EDGES.forEach(([a, b, k], i) => {
+    const A = N[a], B = N[b]; let x1, y1, x2, y2;
+    if (B.x > A.x + A.w) { x1 = A.x + A.w; y1 = A.y + A.h / 2; x2 = B.x; y2 = B.y + B.h / 2; }
+    else if (A.x > B.x + B.w) { x1 = A.x; y1 = A.y + A.h / 2; x2 = B.x + B.w; y2 = B.y + B.h / 2; }
+    else { x1 = A.x + A.w / 2; y1 = A.y + (B.y > A.y ? A.h : 0); x2 = B.x + B.w / 2; y2 = B.y + (B.y > A.y ? 0 : B.h); }
+    const dx = Math.abs(x2 - x1) * .5, horiz = Math.abs(x2 - x1) > 20;
+    const d = horiz ? `M${x1},${y1} C${x1 + (x2 > x1 ? dx : -dx)},${y1} ${x2 - (x2 > x1 ? dx : -dx)},${y2} ${x2},${y2}` : `M${x1},${y1} L${x2},${y2}`;
+    s += `<path class="edge ${k || ""}" data-a="${a}" data-b="${b}" d="${d}" marker-end="url(#ar)"/>`;
+  });
+  // auditor drives core
+  s += `<path class="edge" d="M770,447 C800,447 800,30 770,30" marker-end="url(#ar)"/>`;
+  NODES.forEach(n => {
+    s += `<g class="node ${n.c}" data-id="${n.id}" tabindex="0" role="button" aria-label="${n.l}"><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="7"/><text x="${n.x + 10}" y="${n.y + 17}">${n.l}</text><text class="sub" x="${n.x + 10}" y="${n.y + 31}">${n.s || ""}</text>${n.s2 ? `<text class="sub" x="${n.x + 10}" y="${n.y + 44}">${n.s2}</text>` : ""}</g>`;
+  });
+  s += `<text class="lanelabel" x="783" y="250" transform="rotate(90 783 250)">drives each stage</text></svg>`;
+  $("#arch").innerHTML = s;
+  const pick = id => {
+    document.querySelectorAll("#arch .node").forEach(g => g.classList.toggle("sel", g.dataset.id === id));
+    document.querySelectorAll("#arch .edge").forEach(p => p.classList.toggle("hot", p.dataset.a === id || p.dataset.b === id));
+    const n = N[id], [layer, desc, inp, out] = NODE_INFO[id];
+    $("#archDetail").innerHTML = `<div class="row"><h3>${n.l}</h3><span class="chip ${n.c === "gem" ? "gem" : "acc"}">${layer}</span></div><p>${desc}</p><dl class="kv"><dt>reads</dt><dd>${esc(inp)}</dd><dt>emits</dt><dd>${esc(out)}</dd></dl>`;
+  };
+  document.querySelectorAll("#arch .node").forEach(g => { g.addEventListener("click", () => pick(g.dataset.id)); g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(g.dataset.id); } }); });
+  pick("state");
+}
+renderArch();
+
+/* ---------- 06 API table ---------- */
+const API = [
+  ["main.py", "main(argv) -> int", "CLI entry. Subcommands run (default), eval, validate, explain <case_id>. Flags --dataset, --out, --samples, --no-llm."],
+  ["config.Settings", "Settings.from_env() -> Settings", "Resolves paths relative to the repo root, reads GEMINI_MODEL and GEMINI_API_KEY from env/.env."],
+  ["DatasetRepository", "load(dataset_dir: Path) -> None", "Reads all CSVs, parses timestamps to UTC, builds lookup maps."],
+  ["DatasetRepository", "requests(samples=False) -> list[Request]", "Returns evaluation requests, or the 32 sample requests when samples=True."],
+  ["DatasetRepository", "identity_by_email(email) -> Identity | None", "Case-insensitive match on the current email."],
+  ["DatasetRepository", "audit_for_user(user_id) -> list[AuditEntry]", "Identity changes for a user, ordered by event_time."],
+  ["DatasetRepository", "activity_for_resource(rid) -> list[Activity]", "All activity rows touching a resource, ordered by time."],
+  ["DatasetRepository", "rule_for(category) -> Rule", "Looks up deletion_rules.csv by data_category."],
+  ["EvidenceLoader", "supports(path: Path) -> bool", "True when this loader handles the file extension."],
+  ["EvidenceLoader", "load(evidence_file, path) -> list[RawEvidenceRecord]", "Flattens one file into field/value records stamped with file_id and observed_at. No interpretation."],
+  ["RecordNormalizer", "normalize(record) -> Observation | None", "Interprets a raw record: resource, system, category, presence, status word, identifiers, parent. None if it names no resource."],
+  ["record_normalizer", "resource_prefix(resource_id) -> str", "Type of a resource from its id (analytics_901 → analytics); used to map to a system and to count types per request."],
+  ["SqlLoader", "load(file) -> list[Observation]", "executescript into sqlite3 ':memory:', iterate tables, keep table name to tell primary from replicas."],
+  ["LogLoader", "parse_line(line) -> dict | None", "Regex for timestamp, system, resource_id, emails, user_ids and status words."],
+  ["TextLoader", "parse_row(line) -> dict | None", "Splits pipe-delimited handover rows: time | system | resource | category | state | identifier."],
+  ["PdfLoader", "load(file) -> list[Observation]", "pypdf text extraction; if no text, sends the PDF to Gemini with the media prompt."],
+  ["ImageLoader", "load(file) -> list[Observation]", "Sends the PNG to Gemini once; result cached by content hash."],
+  ["EvidenceIndex", "build(repository, loaders=None) -> EvidenceIndex", "Runs the matching loader per file, normalizes, indexes, and keeps a FileLoadReport per file."],
+  ["EvidenceIndex", "is_citable_at(file_id, cutoff) -> bool", "A step may cite a file only if it was captured by the cutoff."],
+  ["EvidenceIndex", "by_parent(rid, cutoff) -> list[Observation]", "Records derived from the given one, such as search documents of an account."],
+  ["EvidenceIndex", "by_resource(rid, cutoff) -> list[Observation]", "Observations for a resource captured at or before cutoff."],
+  ["EvidenceIndex", "by_identifier(value, cutoff) -> list[Observation]", "Observations containing an email, phone, user_id, name or hash."],
+  ["KeywordIntentClassifier", "classify(request) -> IntentResult", "Refusal cues first (“not a request to erase”), then deletion cues in 6 languages, then the topic of a non-deletion request. Built."],
+  ["KeywordIntentClassifier", "classify_all(requests) -> dict[str, IntentResult]", "Classifies a list; used to keep non-deletion requests out of batch matching."],
+  ["GeminiIntentClassifier", "classify(requests) -> dict[str, IntentResult]", "Batches ~50 requests per call with a strict JSON schema."],
+  ["EnsembleIntentClassifier", "classify(requests) -> dict[str, IntentResult]", "Combines both; uses Gemini when confident, flags disagreements, uses CLASSIFY_REQUEST activity as tie-breaker."],
+  ["IdentityResolver", "resolve(request_email, cutoff) -> SubjectProfile | None", "Current or historical email → user_id → full identifier set valid up to cutoff. Resolves all 508 eval deletion requests."],
+  ["RequestEpisodes", "starts_after(request) -> datetime | None", "The same person's previous audit_at, if that audit finished before this request; evidence before it is ignored."],
+  ["WorkflowWindowMatcher", "matched_activities(case_id) -> list[SystemActivity]", "Deletion-worker activities attributed to the request by elimination or tie-pairing."],
+  ["workflow_matching", "workflow_family(activity) -> str | None", "Wording family of a deletion-worker activity (POLICY_ACTION, RESULT_CHECK, DIRECT_REPORT) or None if shared."],
+  ["IdentityResolver", "email_hash(email) -> str", "sha256 of the normalized email, used to match hashes of historical emails."],
+  ["ResourceLinker", "link(profile, request) -> list[ResourceLink]", "Union of evidence matches, catalog links, parent expansion and matcher results, all inside the request's episode."],
+  ["StateReconstructor", "state_at(link, request) -> ResourceState", "Combines citable readings inside the episode; replica drift, absence by omission, check activities, else UNKNOWN."],
+  ["PolicyEngine", "treatment_for(state) -> Treatment", "Stated category → workflow's attempted action → resource type."],
+  ["PolicyEngine", "evaluate(state) -> Decision", "Finding (or none), remediation and verification for one resource."],
+  ["StepPlanner", "plan(decisions) -> (DeletionStatus, list[Step])", "Status from the decisions; steps built, sorted and numbered."],
+  ["planner", "step_sort_key(step) -> tuple", "(phase index, operation index, system_id, resource_id)."],
+  ["CaseAuditor", "audit(request) -> (CaseResult, AuditTrail)", "Runs all stages for one case; the trail feeds explain."],
+  ["main.py", "explain <case_id>", "Prints intent, subject, each link with its reasons, state, treatment, finding and the final steps."],
+  ["GeminiClient", "generate_json(prompt, schema, parts=None) -> dict", "Cached, retried, temperature 0 call that returns parsed JSON and records usage."],
+  ["ResponseCache", "get(key) / put(key, value)", "File-backed JSON cache under llm/cache/."],
+  ["UsageTracker", "record(model, usage) / to_markdown() -> str", "Accumulates prompt/candidate token counts and renders usage_report.md."],
+  ["OutputWriter", "write(results, path) -> None", "Rows in case number order, compact JSON with fixed key order."],
+  ["OutputValidator", "validate(path, requests) -> list[str]", "Row count, sort order, schema, op/state pairs, numbering, evidence rules, cutoff."],
+  ["Evaluator", "compare(pred, gold) -> Metrics", "Status accuracy, step exact match, per-field accuracy, sequence accuracy, per-case diffs."],
+  ["Evaluator", "to_markdown(metrics, title) -> str", "Renders a metrics table for evaluation_report.md."]
+];
+function renderApi() {
+  const q = $("#apiFilter").value.trim().toLowerCase(), tb = $("#apiTable tbody"); tb.innerHTML = ""; let n = 0;
+  API.forEach(([c, s, d]) => { if (q && !(c + s + d).toLowerCase().includes(q)) return; n++; tb.insertAdjacentHTML("beforeend", `<tr><td><code>${esc(c)}</code></td><td class="mono">${esc(s)}</td><td>${esc(d)}</td></tr>`); });
+  $("#apiCount").textContent = `${n} of ${API.length}`;
+}
+$("#apiFilter").addEventListener("input", renderApi); renderApi();
+
+/* ---------- 07 pipeline ---------- */
+const STAGES = [
+  ["Classify intent", "IntentClassifier", "request_text", "Intent = DELETE", "“I would like the account associated with this address to be erased…” → DELETE (keyword: erased; Gemini agrees). Continues."],
+  ["Resolve identity", "IdentityResolver", "novak.tomasz@icloud.com, audit_at 2026-10-01T12:00Z", "SubjectProfile(user_32)", "Current email in user_identities → <code>user_32</code> (Tomasz Novak). No email change in user_audit_log. Identifiers: email, phone, name, email_hash."],
+  ["Link resources", "ResourceLinker", "SubjectProfile(user_32)", "6 resources", "evidence_03 (handover, captured 2026-10-01T12:00Z) lists rows naming the email or user_32: <code>account_4248</code>, <code>search_052</code>, <code>analytics_2034</code>, <code>support_864</code>, <code>data_flow_9522</code>, <code>audit_record_9394</code>."],
+  ["Reconstruct state", "StateReconstructor", "6 refs, cutoff", "states with evidence", "account_4248 NOT_FOUND → ABSENT · search_052 FOUND → PRESENT · analytics_2034 IDENTIFIABLE → PII_EXPOSED · support_864 IDENTIFIABLE → PII_EXPOSED · audit_record_9394 FOUND → PRESENT · data_flow_9522 ACTIVE. The activity log said the search delete, redaction and anonymization all FAILED (activity_3814–3816), which agrees."],
+  ["Apply policy", "PolicyEngine", "ResourceState ×6", "Decisions", "USER_PROFILE→DELETE ✓ · SEARCH_INDEX_ENTRY→DELETE ✗ · ANALYTICS_PROFILE→ANONYMIZE ✗ · SUPPORT_MESSAGE→REDACT ✗ · SECURITY_AUDIT_LOG→RETAIN ✓"],
+  ["Detect risks", "StateReconstructor + PolicyEngine", "profile, cutoff", "1 active flow", "activity_3817: “data flow data_flow_9522 remains enabled”; evidence_03 shows ACTIVE → REPORT_ACTIVE_DATA_FLOW. No backup holds the subject."],
+  ["Plan steps", "StepPlanner", "Decisions, INCOMPLETE", "14 ordered steps", "4 findings (cite evidence_03) → 4 remediations (flow disabled first) → 6 verifications covering every relevant resource."],
+  ["Write & validate", "OutputWriter / OutputValidator", "CaseResult", "output.csv row", "Row <code>case_11,INCOMPLETE,[…14 steps…]</code>; the validator checks ordering, op/state pairs and evidence rules. Matches sample_output.csv."]
+];
+let stageIdx = 0;
+function renderStages() {
+  const st = $("#stepper"); st.innerHTML = "";
+  STAGES.forEach((s, i) => { const b = el("button", { type: "button", role: "tab", "aria-selected": i === stageIdx }, `<small>${String(i + 1).padStart(2, "0")}</small>${esc(s[0])}`); if (i === stageIdx) b.classList.add("on"); b.onclick = () => { stageIdx = i; renderStages(); }; st.appendChild(b); });
+  const s = STAGES[stageIdx];
+  let extra = "";
+  if (stageIdx === 6) { const c = SAMPLES.find(x => x.id === "case_11"); if (c) extra = `<div class="frame"><table class="steps"><thead><tr><th>#</th><th>Phase</th><th>Operation</th><th>Resource</th><th>Evidence</th></tr></thead><tbody>${c.steps.map((a, i) => `<tr class="p-${a[0]}"><td>${i + 1}</td><td>${a[0]}</td><td class="mono">${a[1]}</td><td class="mono">${a[2]}/${a[3]}</td><td class="mono">${a[4] || "—"}</td></tr>`).join("")}</tbody></table></div>`; }
+  $("#stageBody").innerHTML = `<div class="row"><h3>${String(stageIdx + 1).padStart(2, "0")} · ${esc(s[0])}</h3><span class="chip acc">${esc(s[1])}</span></div><dl class="kv"><dt>input</dt><dd>${esc(s[2])}</dd><dt>output</dt><dd>${esc(s[3])}</dd><dt>case_11 trace</dt><dd>${s[4]}</dd></dl>${extra}<div class="row"><button type="button" ${stageIdx === 0 ? "disabled" : ""} id="stPrev">← Previous</button><button type="button" class="primary" ${stageIdx === STAGES.length - 1 ? "disabled" : ""} id="stNext">Next stage →</button></div>`;
+  $("#stPrev").onclick = () => { if (stageIdx > 0) { stageIdx--; renderStages(); } };
+  $("#stNext").onclick = () => { if (stageIdx < STAGES.length - 1) { stageIdx++; renderStages(); } };
+}
+renderStages();
+
+/* ---------- 08 scenarios ---------- */
+const STAGE_NAMES = ["Intent", "Identity", "Linking", "State @ audit_at", "Policy", "Risks", "Status"];
+const SCEN = [
+  { t: "Not a deletion request", st: "NOT_APPLICABLE", key: 0, ref: null, d: "Access, export, correction or marketing opt-out. Other fields may look like a deletion case. No sample exists; these appear only in the 518.",
+    n: ["Classifier labels ACCESS / EXPORT / CORRECTION / OPT_OUT", "Skipped", "Skipped", "Skipped", "Skipped", "Skipped", "NOT_APPLICABLE, steps_json = []"], steps: [] },
+  { t: "Clean delete, claim true", st: "COMPLETE", key: 3, ref: "case_01", d: "Account absent in the latest snapshot before audit_at. Nothing else linked.",
+    n: ["DELETE", "Current email → user_01", "account_001 only", "Snapshot shows account_001 gone (evidence_54)", "USER_PROFILE → DELETE: compliant", "None", "COMPLETE with cited verification"] },
+  { t: "Claim says failed, data is gone", st: "COMPLETE", key: 3, ref: "case_25", d: "reported_status NOT_STARTED, but evidence proves every treatment was applied. The claim is wrong in the other direction.",
+    n: ["DELETE", "user resolved", "account, audit record, analytics", "Evidence bundle (evidence_92) shows all compliant", "Delete / retain / anonymize all satisfied", "None", "COMPLETE despite reported NOT_STARTED"] },
+  { t: "Replication drift", st: "INCOMPLETE", key: 3, ref: "case_05", d: "Primary table lacks the account, but a failover replica captured before audit_at still has it. A SYNC to the replica ran seconds after the delete.",
+    n: ["DELETE", "user_05", "account_005", "Primary ABSENT, failover replica PRESENT (evidence_54) ⇒ PRESENT", "USER_PROFILE → DELETE: violated", "None", "INCOMPLETE: report, delete, verify absent"] },
+  { t: "Downstream copy left behind", st: "INCOMPLETE", key: 3, ref: "case_06", d: "Account deleted, but a search entry, support attachment or export link survived. Covers case_06 (search), case_07 (attachment), case_08 (export).",
+    n: ["DELETE", "user_06", "account_006 + child search_001 (parent link)", "search_001 still in search primary (evidence_57)", "SEARCH_INDEX_ENTRY → DELETE: violated", "None", "INCOMPLETE; verification also re-checks the account"] },
+  { t: "Old email in older systems", st: "INCOMPLETE", key: 1, ref: "case_10", d: "Request email is historical. Only user_audit_log connects it to the user, and older records still carry it.",
+    n: ["DELETE", "Email matches user_audit_log old_value ⇒ user_10", "Resources found via old and new identifiers", "support_002 still present", "Policy violated for the support record", "None", "INCOMPLETE"] },
+  { t: "Exposed PII + active flow", st: "INCOMPLETE", key: 5, ref: "case_11", d: "Several retained records still identify the user, and a connector is still copying data. The flow must be disabled before records are fixed.",
+    n: ["DELETE", "user_32", "6 resources from evidence_03", "search PRESENT, analytics/support IDENTIFIABLE", "DELETE, ANONYMIZE, REDACT violations", "data_flow_9522 ACTIVE", "INCOMPLETE; DISABLE_DATA_FLOW first"] },
+  { t: "Restore risk from backup", st: "INCOMPLETE", key: 5, ref: "case_09", d: "Live data is gone, but a backup containing the user can still be restored. Backups are retained, so the fix is BLOCK_RESTORE, not delete.",
+    n: ["DELETE", "user resolved", "account, audit record, backup", "Account ABSENT, audit record PRESENT", "BACKUP_ARCHIVE → RETAIN with restore blocked", "backup_4978 restore open", "INCOMPLETE; block restore, verify"] },
+  { t: "Active data flow only", st: "INCOMPLETE", key: 5, ref: "case_15", d: "Every record is compliant, but an integration is still enabled and could recreate data.",
+    n: ["DELETE", "user resolved", "account, audit record, connector", "All records compliant", "Compliant", "data_flow_9846 still enabled", "INCOMPLETE; disable, verify disabled"] },
+  { t: "Tombstone still has PII", st: "INCOMPLETE", key: 4, ref: "case_32", d: "Account deleted, deleted-account record kept for references, but it still holds name, email, phone and hash. Compare case_31 where the tombstone is clean (COMPLETE).",
+    n: ["DELETE", "user resolved", "account, audit record, tombstone_9178", "Tombstone holds direct identifiers (evidence_51)", "ACCOUNT_TOMBSTONE → REDACT, keep user_id: violated", "None", "INCOMPLETE; redact tombstone"] },
+  { t: "Everything treated correctly", st: "COMPLETE", key: 4, ref: "case_26", d: "All six treatment types present and proven: absent, retained, redacted, anonymized, flow disabled, restore blocked.",
+    n: ["DELETE", "user resolved", "6 resources", "All compliant in evidence_92", "Every rule satisfied", "Flow disabled, restore blocked (proven)", "COMPLETE with 6 cited verifications"] },
+  { t: "Evidence after audit_at", st: "depends", key: 3, ref: "case_27", d: "A file captured after audit_at might show a fix or a leak. It must be ignored. The answer reflects the world at the cutoff.",
+    n: ["DELETE", "user resolved", "Resources linked", "EvidenceIndex hides files with captured_at > audit_at", "Policy on pre-cutoff state only", "Same cutoff applies to flows", "Status as of audit_at; no later evidence cited"] },
+  { t: "No identity match", st: "open question", key: 1, ref: null, d: "Email matches neither current nor historical identities. Needs a decision (see Open questions). Likely rare or absent.",
+    n: ["DELETE", "No user found", "Fallback: search evidence by raw email", "Whatever the email alone proves", "Apply rules to anything found", "—", "Decide: COMPLETE with no records, or INCOMPLETE"], steps: [] }
+];
+let scenIdx = 0;
+function renderScen() {
+  const list = $("#scenList"); list.innerHTML = "";
+  SCEN.forEach((s, i) => { const b = el("button", { type: "button" }, esc(s.t)); if (i === scenIdx) b.classList.add("on"); b.onclick = () => { scenIdx = i; renderScen(); }; list.appendChild(b); });
+  const s = SCEN[scenIdx];
+  $("#scenTitle").textContent = s.t; $("#scenDesc").textContent = s.d;
+  $("#scenStatus").innerHTML = ["COMPLETE", "INCOMPLETE", "NOT_APPLICABLE"].includes(s.st) ? statusChip(s.st) : `<span class="chip warn">${s.st}</span>`;
+  $("#scenLanes").innerHTML = STAGE_NAMES.map((n, i) => `<div class="lanestep ${i === s.key ? "key" : ""}"><div class="st"><i></i>${n}${i === s.key ? " · decides" : ""}</div><div>${esc(s.n[i])}</div></div>`).join("");
+  const c = s.ref && SAMPLES.find(x => x.id === s.ref);
+  const steps = c ? c.steps : [];
+  $("#scenSteps").innerHTML = steps.length ? steps.map((a, i) => `<tr class="p-${a[0]}"><td>${i + 1}</td><td>${a[0]}</td><td class="mono">${a[1]}</td><td class="mono">${a[2]}/${a[3]}</td><td class="mono">${a[4] || "—"}</td></tr>`).join("") : `<tr><td colspan="5">${s.st === "NOT_APPLICABLE" ? "<code>[]</code>, an empty array" : "No sample for this family yet."}</td></tr>`;
+  $("#scenRef").textContent = c ? `From sample_output.csv · ${c.id} · reported ${c.reported} → actual ${c.status}` : "";
+}
+renderScen();
+
+/* ---------- 09 calculator ---------- */
+const CALC = [
+  ["c_req", "Requests", 518], ["c_batch", "Requests per batch", 50], ["c_tin", "Input tokens per request", 110], ["c_over", "Prompt overhead per batch", 700],
+  ["c_tout", "Output tokens per request", 25], ["c_media", "Media files (PNG + PDF)", 15], ["c_min", "Input tokens per media file", 1800], ["c_mout", "Output tokens per media file", 900],
+  ["c_pin", "Price per 1M input tokens ($)", ""], ["c_pout", "Price per 1M output tokens ($)", ""]
+];
+$("#calcInputs").innerHTML = CALC.map(([id, l, v]) => `<label class="metric" for="${id}"><small class="mono" style="color:var(--muted)">${l}</small><input type="text" inputmode="decimal" id="${id}" value="${v}" ${v === "" ? 'placeholder="enter current price"' : ""}></label>`).join("");
+function calc() {
+  const g = id => parseFloat($("#" + id).value) || 0;
+  const batches = Math.ceil(g("c_req") / Math.max(1, g("c_batch")));
+  const tin = batches * g("c_over") + g("c_req") * g("c_tin") + g("c_media") * g("c_min");
+  const tout = g("c_req") * g("c_tout") + g("c_media") * g("c_mout");
+  const calls = batches + g("c_media");
+  const priced = $("#c_pin").value !== "" && $("#c_pout").value !== "";
+  const cost = (tin * g("c_pin") + tout * g("c_pout")) / 1e6;
+  const f = n => n.toLocaleString("en-US");
+  $("#calcOut").innerHTML = [
+    ["Model calls (cold run)", f(calls)], ["Input tokens", f(tin)], ["Output tokens", f(tout)],
+    ["Avg tokens per request", f(Math.round((tin + tout) / Math.max(1, g("c_req"))))],
+    ["Total cost", priced ? "$" + cost.toFixed(4) : "enter prices"], ["Cost per request", priced ? "$" + (cost / Math.max(1, g("c_req"))).toFixed(6) : "enter prices"],
+    ["Warm run (all cached)", "0 calls · $0"]
+  ].map(([l, v]) => `<div class="panel metric"><small class="mono" style="color:var(--muted)">${l}</small><b>${v}</b></div>`).join("");
+}
+CALC.forEach(([id]) => $("#" + id).addEventListener("input", calc)); calc();
+
+/* ---------- 10 playground ---------- */
+const caseSel = $("#caseSel"), goldSel = $("#valGold");
+SAMPLES.forEach(c => { caseSel.add(new Option(`${c.id} · ${c.status}`, c.id)); goldSel.add(new Option(c.id, c.id)); });
+function renderCase() {
+  const c = SAMPLES.find(x => x.id === caseSel.value); if (!c) return;
+  const mismatch = (c.reported === "COMPLETE") !== (c.status === "COMPLETE");
+  $("#caseChips").innerHTML = `<span class="chip">reported ${c.reported}</span>→ ${statusChip(c.status)} ${mismatch ? '<span class="chip warn">claim was wrong</span>' : '<span class="chip">claim held</span>'} <span class="chip">audit_at ${c.audit_at.replace("T", " ").replace("Z", "Z")}</span>`;
+  $("#caseText").textContent = "“" + c.text + "”";
+  $("#caseSteps").innerHTML = c.steps.map((a, i) => `<tr class="p-${a[0]}"><td>${i + 1}</td><td>${a[0]}</td><td class="mono">${a[1]}</td><td class="mono">${a[2]}</td><td class="mono">${a[3]}</td><td class="mono">${a[4] || "—"}</td></tr>`).join("");
+}
+caseSel.addEventListener("change", renderCase);
+caseSel.value = "case_11"; renderCase();
+
+function shuffled(arr) { const a = arr.slice(); let seed = 7; for (let i = a.length - 1; i > 0; i--) { seed = (seed * 9301 + 49297) % 233280; const j = Math.floor(seed / 233280 * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function loadCase(id, shuffle) {
+  const c = SAMPLES.find(x => x.id === id); if (!c) return;
+  let steps = c.steps.map(toStep); if (shuffle) steps = shuffled(steps);
+  $("#valInput").value = JSON.stringify(steps, null, 1);
+  $("#valStatus").value = c.status; goldSel.value = c.id;
+}
+$("#loadIntoValidator").addEventListener("click", () => { loadCase(caseSel.value, true); validate(); $("#valInput").scrollIntoView({ block: "center", behavior: "smooth" }); });
+
+function validate() {
+  const out = [], status = $("#valStatus").value; let steps;
+  try { steps = JSON.parse($("#valInput").value || "[]"); } catch (e) { $("#valIssues").innerHTML = `<div class="issue bad">✗ Not valid JSON: ${esc(e.message)}</div>`; $("#valMetrics").innerHTML = ""; return; }
+  if (!Array.isArray(steps)) { $("#valIssues").innerHTML = `<div class="issue bad">✗ steps_json must be a JSON array.</div>`; return; }
+  const FIELDS = ["step_no", "phase", "system_id", "resource_id", "operation", "state", "evidence_id"];
+  if (status === "NOT_APPLICABLE" && steps.length) out.push([false, "NOT_APPLICABLE must have an empty array."]);
+  if (status !== "NOT_APPLICABLE" && !steps.length) out.push([false, `${status} needs at least one step.`]);
+  steps.forEach((s, i) => {
+    const tag = `step ${i + 1}`;
+    const keys = Object.keys(s).sort().join(","); if (keys !== FIELDS.slice().sort().join(",")) out.push([false, `${tag}: fields must be exactly ${FIELDS.join(", ")}.`]);
+    if (s.step_no !== i + 1) out.push([false, `${tag}: step_no is ${s.step_no}, expected ${i + 1}.`]);
+    const m = OP_META[s.operation];
+    if (!m) out.push([false, `${tag}: unknown operation ${s.operation}.`]);
+    else { if (m.phase !== s.phase) out.push([false, `${tag}: ${s.operation} belongs to ${m.phase}, not ${s.phase}.`]); if (m.state !== s.state) out.push([false, `${tag}: ${s.operation} requires state ${m.state}, not ${s.state}.`]); }
+    if (status === "COMPLETE" && s.phase !== "VERIFICATION") out.push([false, `${tag}: COMPLETE cases contain verification steps only.`]);
+    if (status === "COMPLETE" && !s.evidence_id) out.push([false, `${tag}: COMPLETE verification must cite evidence.`]);
+    if (status === "INCOMPLETE" && s.phase === "FINDING" && !s.evidence_id) out.push([false, `${tag}: findings must cite evidence.`]);
+    if (status === "INCOMPLETE" && s.phase !== "FINDING" && s.evidence_id) out.push([false, `${tag}: future ${s.phase.toLowerCase()} steps must have empty evidence_id.`]);
+    if (i > 0 && cmp(steps[i - 1], s) > 0) out.push([false, `${tag}: out of order. ${steps[i - 1].operation} ${steps[i - 1].resource_id} should come after ${s.operation} ${s.resource_id}.`]);
+  });
+  if (status === "INCOMPLETE" && steps.length && !steps.some(s => s.phase === "FINDING")) out.push([false, "INCOMPLETE needs at least one finding."]);
+  if (!out.length) out.push([true, "Passes every contract check."]);
+  $("#valIssues").innerHTML = out.slice(0, 30).map(([ok, m]) => `<div class="issue ${ok ? "ok" : "bad"}">${ok ? "✓" : "✗"} <span>${esc(m)}</span></div>`).join("") + (out.length > 30 ? `<div class="issue">… ${out.length - 30} more</div>` : "");
+  // mini evaluator
+  const g = SAMPLES.find(x => x.id === goldSel.value);
+  if (!g) { $("#valMetrics").innerHTML = ""; return; }
+  const gold = g.steps.map(toStep), n = Math.max(gold.length, steps.length);
+  let exact = 0, fieldHits = 0; const fieldTot = n * FIELDS.length;
+  for (let i = 0; i < n; i++) { const a = steps[i] || {}, b = gold[i] || {}; let all = true; FIELDS.forEach(f => { if (a[f] === b[f]) fieldHits++; else all = false; }); if (all) exact++; }
+  const seq = steps.length === gold.length && exact === gold.length;
+  const pct = x => (100 * x).toFixed(1) + "%";
+  $("#valMetrics").innerHTML = [["Status", status === g.status ? "match" : "mismatch"], ["Step exact match", `${exact}/${gold.length}`], ["Field accuracy", pct(fieldHits / Math.max(1, fieldTot))], ["Sequence", seq ? "exact" : "differs"]]
+    .map(([l, v]) => `<div class="panel metric"><small class="mono" style="color:var(--muted)">${l}</small><b>${v}</b></div>`).join("");
+}
+$("#btnValidate").addEventListener("click", validate);
+$("#btnSort").addEventListener("click", () => {
+  let steps; try { steps = JSON.parse($("#valInput").value || "[]"); } catch (e) { validate(); return; }
+  const status = $("#valStatus").value;
+  steps.sort(cmp).forEach((s, i) => { s.step_no = i + 1; if (OP_META[s.operation]) { s.phase = OP_META[s.operation].phase; s.state = OP_META[s.operation].state; } if (status === "INCOMPLETE" && s.phase !== "FINDING") s.evidence_id = ""; });
+  $("#valInput").value = JSON.stringify(steps, null, 1); validate();
+});
+loadCase("case_11", true); validate();
+
+/* ---------- 11 trade-offs ---------- */
+const TRADE = [
+  ["Who reasons over evidence", "Rules-first Python; Gemini only for intent and media", "Deterministic, cheap, debuggable, matches exact-match grading", "Less “agentic” on the surface; every pattern must be coded"],
+  ["Intent: per request vs batched", "Batches of ~50", "~11 calls instead of 518", "One malformed reply fails 50 cases; validate schema and retry that batch"],
+  ["Media extraction timing", "Once per file, cached", "15 calls total; reruns free", "An extraction mistake spreads to every case using that file; needs eyeballing"],
+  ["Model tier", "Flash-class Gemini, pinned by name", "Low cost, fast", "May miss small text in screenshots; upgrade only the media step if so"],
+  ["Keyword fallback", "Keep and ensemble", "Works offline; cross-checks the model", "Extra code; multilingual keyword lists need care"],
+  ["Activity results", "Claims only; evidence wins", "Matches the spec; catches false COMPLETEs", "When no evidence exists we need a default (proposed: cannot prove COMPLETE)"],
+  ["Category source", "Evidence row category first, resource prefix fallback", "Uses the data’s own labels (e.g. evidence_03 rows carry SEARCH_INDEX_ENTRY)", "Formats without a category need the prefix map"],
+  ["Commit LLM cache", "Yes, after a privacy check", "Reproducible output without a key", "Larger zip; must contain only fictional data"],
+  ["Python version", "3.14.4 (wheels installed fine)", "One interpreter", "None so far"],
+  ["Repeat requesters", "Only evidence after the person's previous audit", "Removed all 3 wrong links in the samples", "A record found only by an earlier audit and never seen again is not re-verified"],
+  ["Ties between batch-mates", "Pair k-to-k ties in a fixed order, mark as paired", "Partial credit even when wrong (phase/operation/state/evidence still right)", "About a coin flip per tie; a wrong account could flip a status if states differ"],
+  ["Intent classifier timing", "Keyword classifier built in M2, Gemini later", "Needed now to keep non-deletion requests out of matching", "Keyword lists must keep up with new phrasing; Gemini cross-check in M5"]
+];
+$("#tradeBody").innerHTML = TRADE.map(r => `<tr>${r.map((c, i) => `<td>${i === 0 ? `<b>${esc(c)}</b>` : esc(c)}</td>`).join("")}</tr>`).join("");
+const RISKS = [
+  ["Identifier-free records in shared batches (deleted accounts, anonymized analytics)", "171 links are paired guesses across 146 eval cases; 35 stay ambiguous", "Elimination rules first; pairing marked; decide keep/drop with M4 eval numbers"],
+  ["Choosing the evidence_id when several files prove the same state", "Field accuracy on most steps", "Derive the rule from samples (they often cite one bundle file for all steps); unit-test it"],
+  ["Missing linked resources (historical identifiers, multi-hop parents)", "Missed findings, wrong status", "Linking diff on samples; hash old emails; follow parents transitively"],
+  ["Rule conditions only visible in documents or images", "Wrong RETAIN vs DELETE", "Extract conditions in media prompt; legal_retention_register PDF into index"],
+  ["Deliberately confusing or multilingual requests", "Wrong NOT_APPLICABLE", "Ensemble classifier; print disagreements; read them by hand"],
+  ["Over-fitting to 32 samples", "Hidden-set drop", "Rules from the spec; samples only confirm; 3+ custom cases for unseen patterns"],
+  ["Gemini outage or quota", "Run blocked", "Cache + --no-llm path"]
+];
+$("#riskBody").innerHTML = RISKS.map((r, i) => `<tr><td class="mono">${i + 1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("");
+
+/* ---------- 12 questions ---------- */
+const QS = [
+  ["Which evidence file is cited?", "COMPLETE samples usually cite one bundle file for every step (evidence_92, evidence_94, evidence_54). Hypothesis: the latest file at or before audit_at that covers the resource. Test on all 32."],
+  ["Why is analytics_9914 deleted, not anonymized? (case_12)", "Rule 07 says ANONYMIZE analytics profiles. case_12 reports it as a remaining record and deletes it. Its category in evidence may differ (for example a user export or secondary identifier). Check evidence_01."],
+  ["Verification scope for INCOMPLETE", "Samples verify every relevant resource, not only the remediated ones (account ABSENT and audit record PRESENT appear even when only search was fixed). Confirm across all samples."],
+  ["No evidence for a resource", "If activity says SUCCESS but no snapshot exists, is it compliant? Proposed: unknown means not proven, so the resource is not cited as verified. Check whether any sample hits this."],
+  ["Unmatched email (answered)", "None of the 508 eval deletion requests is unmatched: every email resolves through current identities or the audit log."],
+  ["Keep tie pairing?", "Pairing links 171 records, about a coin flip each. Recommendation: keep it, because a wrong guess still scores on four of seven fields and leaving it out loses the whole step. Re-check once M4 can score full steps."],
+  ["Gold resources with no trace (answered)", "account_004, audit_record_6645 and audit_record_5569 appear in no participant file. Some expected steps cannot be produced from data; 100% linking is not reachable."],
+  ["Downstream before source", "The spec says process downstream copies before their source records when the dependency requires it. Operation order already puts DISABLE/BLOCK first. Watch for a case where two DELETEs need a dependency order that alphabetical sorting breaks."]
+];
+$("#qList").innerHTML = QS.map(([q, a]) => `<div class="panel"><h4>${esc(q)}</h4><p>${esc(a)}</p></div>`).join("");
+
+/* ---------- 14 decisions ---------- */
+const DECISIONS = [
+  ["M1", "Loaders only flatten; one RecordNormalizer interprets", "Six loaders interpreting “deleted” six ways would drift", "Single place to fix field meanings", "decided"],
+  ["M1", "A fact is visible when observed_at ≤ audit_at; a file is citable when captured_at ≤ audit_at", "A log exported after the audit can still record a lookup made before it (case_09 needs this)", "More facts usable without citing late files", "decided"],
+  ["M2", "Never link by name", "The data plants near-namesakes (Jonas Berg / Jonas Berglund)", "Fewer false links", "decided"],
+  ["M2", "Hash every past email (sha256 of lowercase)", "Some systems store only the hash of an old email (case_12)", "Finds hash-only copies", "decided"],
+  ["M2", "Build the keyword intent classifier now", "Non-deletion requests share batch windows and blocked real matches", "Exactly 10/518 non-deletion; 0/32 samples", "decided"],
+  ["M2", "Repeat requesters use only evidence after their previous audit", "case_07 and case_17 picked up records from earlier audits (case_61, case_46)", "Extras 3 → 0 from this rule", "decided"],
+  ["M2", "Wording-family rule in batch matching", "Each workflow words its actions one way; mixing styles means a different request", "Resolved several ties", "decided"],
+  ["M2", "Claim used only to tell batch-mates apart", "reported_status mirrors the primary delete result in every sample batch; never used as proof", "Account ties resolved where results differ", "decided"],
+  ["M2", "Pair k-to-k ties in a fixed order (marked)", "Evidence cannot separate them; a guess scores partially, a gap scores zero", "+5 found in samples, 1 wrong; 171 paired overall", "your call"],
+  ["M2", "Leave other ambiguous records unlinked", "Giving a stranger's record to a subject is worse than a missing check", "35 records stay unlinked", "decided"],
+  ["M3", "Only evidence sets a state; latest citable reading wins", "Activity results are claims (AGENTS.md 6.6)", "Claims never create or clear a finding", "decided"],
+  ["M3", "Ignore evidence files captured after audit_at, even for facts observed earlier", "“Evidence created later must not change the answer” (6.2)", "103 eval resources stay UNKNOWN (e.g. case_126)", "decided"],
+  ["M3", "A replica copy beats a 'gone' reading", "Replication drift (case_05)", "Finding on the replica copy", "decided"],
+  ["M3", "Complete store listings prove absence by omission", "case_01 and case_31 are verified by files that do not list the account", "Cited ABSENT checks without an explicit 404", "decided"],
+  ["M3", "Treatment: stated category → workflow's attempted action → type", "The workflow acts on the company's own classification (support_002, analytics_9914 are deleted)", "Matches all 103 linked sample decisions", "decided"],
+  ["M3", "Lookup keys are not record contents", "An anonymized row found by searching an email is still anonymized", "No false EXPOSED_PII findings", "decided"],
+  ["M3", "UNKNOWN is never a finding", "A FAILED claim is not proof (case_23's account_410)", "No invented leftovers", "decided"],
+  ["M4", "INCOMPLETE verification covers every relevant resource", "The samples verify compliant resources too (case_11's account)", "Matches sample sequences", "decided"],
+  ["M4", "COMPLETE check with no evidence file cites the latest activity_id", "COMPLETE checks must cite; activity ids are allowed evidence", "24 eval cases cite an activity instead of nothing", "decided"],
+  ["M4", "Rows in case number order", "The input file is in number order; plain string order puts case_100 before case_33", "Same order as deletion_requests.csv", "decided"]
+];
+$("#decBody").innerHTML = DECISIONS.map((d, i) => `<tr><td class="mono">${i + 1}</td><td><b>${esc(d[1])}</b><br><span class="chip">${d[0]}</span></td><td>${esc(d[2])}</td><td>${esc(d[3])}</td><td>${d[4] === "decided" ? '<span class="chip ver">decided</span>' : '<span class="chip warn">your call</span>'}</td></tr>`).join("");
+
+/* ---------- 13 pre-flight ---------- */
+const PF = [
+  ["Environment", [
+    ["venv created and activated", "python -m venv .venv inside solution/"],
+    ["google-genai installs on this Python", "Python 3.14.4 is installed; fall back to 3.12 if wheels fail"],
+    ["Vertex AI ADC login works", "gcloud auth application-default login; gemini-3.6-flash verified by the other session"],
+    [".env and llm cache rules in .gitignore", "Decide now whether the cache is committed"],
+    ["sqlite3 module works", "python -c \"import sqlite3\" (the CLI is not installed, the module is enough)"],
+    ["pypdf extracts text from one PDF", "Try legal_retention_register_20260529.pdf"]
+  ]],
+  ["Data sanity", [
+    ["All 94 manifest paths exist on disk", "evidence_files.csv → dataset/evidence/…"],
+    ["518 unique case_ids in deletion_requests.csv", "No duplicates, all parse"],
+    ["All timestamps parse as UTC", "requested_at, reported_at, audit_at, event_time, captured_at"],
+    ["sample_output.csv steps parse as JSON", "32 rows"],
+    ["Understand one file of each format by eye", "sql, json, log, txt, pdf, png"]
+  ]],
+  ["Contract locked", [
+    ["Operation order constant copied from the spec", "15 operations, exact order"],
+    ["Output path fixed: solution/output.csv", "Repository root of the submission"],
+    ["JSON serialization chosen", "sort_keys, compact separators, UTF-8"],
+    ["Validator rules listed", "Same rules as the playground validator"]
+  ]],
+  ["Design decisions signed off", [
+    ["Rules-first, Gemini for intent + media only", "Section 09"],
+    ["Gemini model name chosen and pinned", "Check current model list and pricing"],
+    ["Evidence-citation hypothesis written down", "Open question 1"],
+    ["Default for “no evidence” agreed", "Open question 4"],
+    ["Custom evaluation case ideas drafted (3+)", "Historical email, non-deletion in Spanish, tombstone + active flow, post-audit evidence"]
+  ]],
+  ["Process", [
+    ["log.txt and transcript.txt appended every turn", "AGENTS.md §5 format with tool= and model="],
+    ["Work only inside solution/", "The fork is read-only reference"],
+    ["Git branch for development", "Commit at the end of each milestone"],
+    ["dataset/ excluded from code.zip", "Also .venv and .env"]
+  ]]
+];
+function renderPF() {
+  const done = store.get("gd_pf", {}); const host = $("#pfGroups"); host.innerHTML = "";
+  PF.forEach(([g, items], gi) => {
+    const p = el("div", { class: "panel" }); p.innerHTML = `<h3>${esc(g)}</h3>`;
+    items.forEach(([t, s], ii) => {
+      const k = gi + "_" + ii;
+      const l = el("label", { class: "chk" }, `<input type="checkbox" id="pf_${k}" ${done[k] ? "checked" : ""}><span>${esc(t)}<small>${esc(s)}</small></span>`);
+      l.querySelector("input").addEventListener("change", e => { const st = store.get("gd_pf", {}); st[k] = e.target.checked; store.set("gd_pf", st); renderPFPct(); });
+      p.appendChild(l);
+    });
+    host.appendChild(p);
+  });
+  renderPFPct();
+}
+function renderPFPct() {
+  const done = store.get("gd_pf", {}); let tot = 0, n = 0;
+  PF.forEach(([, items], gi) => items.forEach((_, ii) => { tot++; if (done[gi + "_" + ii]) n++; }));
+  $("#pfPct").textContent = `${n} of ${tot} ready`; $("#pfBar").style.width = Math.round(100 * n / tot) + "%";
+}
+$("#pfReset").addEventListener("click", () => { store.set("gd_pf", {}); renderPF(); });
+renderPF();
+</script>

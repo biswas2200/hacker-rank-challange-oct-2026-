@@ -1,0 +1,29 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": "darwish.omar@icloud.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": "Omar Darwish",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "analytics_7438",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": "user_20"
+   }
+  ],
+  "screen_subject_user_id": "user_20"
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1813,
+  "output_tokens": 147,
+  "thinking_tokens": 0
+ }
+}

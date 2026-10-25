@@ -1,0 +1,120 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "delivery_confirmation_19.pdf",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "delivery_confirmation_19.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "delivery_confirmation_20.pdf",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "delivery_confirmation_20.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "return_label_4821.pdf",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "return_label_4821.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "return_label_4876.pdf",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "return_label_4876.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "invoice_NS-10493.pdf",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "invoice_NS-10493.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "parcel_damage_7713.jpg",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "parcel_damage_7713.jpg",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "customer_export_2026-02-10.zip",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "customer_export_2026-02-10.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": "customer_export_2026-02-12.zip",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "customer_export_2026-02-12.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1813,
+  "output_tokens": 971,
+  "thinking_tokens": 0
+ }
+}

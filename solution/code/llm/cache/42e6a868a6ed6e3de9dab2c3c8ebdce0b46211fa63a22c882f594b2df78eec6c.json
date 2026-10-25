@@ -1,0 +1,29 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": "sj.park@naver.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": "Soo-jin Park",
+    "parent_resource_id": null,
+    "phone": "+82 10-5837-9451",
+    "resource_id": "marketing_001",
+    "restore_allowed": null,
+    "status": "Live",
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1839,
+  "output_tokens": 154,
+  "thinking_tokens": 0
+ }
+}

@@ -1,0 +1,120 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "delivery_confirmation_19.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "delivery_confirmation_20.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "return_label_4821.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "return_label_4876.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "invoice_NS-10493.pdf",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "parcel_damage_7713.jpg",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "customer_export_2026-02-10.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": "northstar-customer-data",
+    "phone": null,
+    "resource_id": "customer_export_2026-02-12.zip",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "HIGH",
+ "usage": {
+  "input_tokens": 1813,
+  "output_tokens": 599,
+  "thinking_tokens": 7179
+ }
+}

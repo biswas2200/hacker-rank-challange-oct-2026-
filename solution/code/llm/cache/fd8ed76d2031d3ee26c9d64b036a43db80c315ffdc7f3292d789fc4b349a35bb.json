@@ -1,0 +1,42 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": "g.silva76@gmail.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": "Gabriel Silva",
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "search_428",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": "user_13"
+   },
+   {
+    "data_category": null,
+    "email": "g.silva76.jr@gmail.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "search_1874",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1839,
+  "output_tokens": 256,
+  "thinking_tokens": 0
+ }
+}

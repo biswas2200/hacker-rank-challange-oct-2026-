@@ -1,0 +1,94 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": "Account lifecycle",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_003",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   },
+   {
+    "data_category": "Session management",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_002",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   },
+   {
+    "data_category": "Authentication",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_001",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   },
+   {
+    "data_category": "Profile update",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_006",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   },
+   {
+    "data_category": "Authentication",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_005",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   },
+   {
+    "data_category": "Authentication",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "audit_record_004",
+    "restore_allowed": null,
+    "status": "Valid",
+    "user_id": "user_03"
+   }
+  ],
+  "screen_subject_user_id": "user_03"
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1839,
+  "output_tokens": 686,
+  "thinking_tokens": 0
+ }
+}

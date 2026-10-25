@@ -1,0 +1,81 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": "bluepeakco@outlook.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "backup_9291",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "miller.logistics@company.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "backup_9288",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "areed1433@gmail.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "backup_9287",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "summit-retail@company.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "backup_9286",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "backup_9281",
+    "restore_allowed": null,
+    "status": "Completed",
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1813,
+  "output_tokens": 569,
+  "thinking_tokens": 427
+ }
+}

@@ -1,0 +1,24 @@
+
+## [2026-10-25T17:53:00+05:30] Turn {N1} (playground session; times of the turns below are approximate)
+USER: This chat is a playground: code run here must not go into the solution folder; create a separate folder if needed and do not mix it up.
+ASSISTANT: Agreed: solution/ is read-only in this chat; tests and outputs go in a separate playground/ folder at the repo root, which imports solution code in place.
+
+## [2026-10-25T17:53:00+05:30] Turn {N2}
+USER: run data frame and show me the first 5 record of the deletion request.csv
+ASSISTANT: Neither system Python nor solution/.venv has pandas. Tried to create playground/.venv with pandas; the user stopped that call.
+
+## [2026-10-25T17:53:00+05:30] Turn {N3}
+USER: pause it, if u still want do it in background to create an install the pandas, here show me the first 5 record in proper table for the deletion request.csv
+ASSISTANT: Showed case_33-case_37 (518 rows in total) as a table using the built-in csv module. The pandas install in the background failed once on a network timeout; the retry with resume installed pandas 3.1.0 in playground/.venv. solution/ was not touched.
+
+## [2026-10-25T17:53:00+05:30] Turn {N4}
+USER: now take one deletion request and tell me the flow of it to the end the sample output where one requesst actually deleted and another one doesn't deleted.
+ASSISTANT: Traced case_01 (COMPLETE) and case_05 (INCOMPLETE) through the data files. Both say COMPLETE with SUCCESS deletes, but evidence_54 (a failover replica SQL snapshot) still has account_005 ACTIVE in the replica table, after a SYNC_RECORD to account_failover_replica; account_001 is gone from both tables. So case_01 gets one VERIFY_RECORD_ABSENT step and case_05 gets FINDING -> DELETE -> VERIFY. Pointed out the Karim El-Masri decoy row.
+
+## [2026-10-25T17:53:00+05:30] Turn {N5}
+USER: can u explain me user_audit_log which says that, old email and old phones I doesn't understood what it actually means
+ASSISTANT: Explained that user_audit_log.csv is the history of email, phone and email_hash changes, while user_identities.csv holds only current values. Example case_34 (user_11 Haruka): old phone +81 90 6156 0005 (audit_279) still appears in support_9538's attachment scan in service_events_ap_south_20260915.log. Searching only the current identifiers would miss it. Noted that audit_record_3753 matching user_11 is allowed under rule_12 (RETAIN).
+
+## [2026-10-25T17:53:00+05:30] Turn {N6}
+USER: (session cf asked to append these playground turns to solution/transcript.txt and log.txt)
+ASSISTANT: Drafted the entries in playground/ and asked the user before writing into solution/, because the user said earlier not to write there.

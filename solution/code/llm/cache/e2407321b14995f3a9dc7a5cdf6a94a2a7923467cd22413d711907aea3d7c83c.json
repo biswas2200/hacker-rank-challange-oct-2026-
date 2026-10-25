@@ -1,0 +1,73 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "intent-v2",
+ "purpose": "intent",
+ "response": {
+  "ACCESS": [
+   "case_539"
+  ],
+  "CORRECTION": [
+   "case_533",
+   "case_537",
+   "case_541"
+  ],
+  "DELETE": [
+   "case_525",
+   "case_526",
+   "case_528",
+   "case_529",
+   "case_530",
+   "case_531",
+   "case_543",
+   "case_544",
+   "case_547",
+   "case_548",
+   "case_549",
+   "case_59",
+   "case_62",
+   "case_64",
+   "case_65",
+   "case_67",
+   "case_70",
+   "case_71",
+   "case_74",
+   "case_76",
+   "case_79",
+   "case_81",
+   "case_82",
+   "case_83",
+   "case_85",
+   "case_87",
+   "case_88",
+   "case_89",
+   "case_91",
+   "case_92",
+   "case_94",
+   "case_95",
+   "case_97",
+   "case_98",
+   "case_99",
+   "custom_02",
+   "custom_03"
+  ],
+  "EXPORT": [
+   "case_535",
+   "case_540",
+   "case_542",
+   "custom_01"
+  ],
+  "OPT_OUT": [
+   "case_534",
+   "case_538"
+  ],
+  "OTHER": [
+   "case_536"
+  ]
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 2329,
+  "output_tokens": 465,
+  "thinking_tokens": 0
+ }
+}

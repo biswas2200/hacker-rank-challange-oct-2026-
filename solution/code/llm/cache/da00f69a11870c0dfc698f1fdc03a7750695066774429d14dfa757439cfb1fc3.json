@@ -1,0 +1,68 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": "Orders",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "ORD-20263245",
+    "restore_allowed": null,
+    "status": "Active",
+    "user_id": "user_17"
+   },
+   {
+    "data_category": "Support",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "CS-3245",
+    "restore_allowed": null,
+    "status": "Active",
+    "user_id": "user_17"
+   },
+   {
+    "data_category": "Support",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "CS-3378",
+    "restore_allowed": null,
+    "status": "Active",
+    "user_id": "user_17"
+   },
+   {
+    "data_category": "Finance",
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "FIN-7742",
+    "restore_allowed": null,
+    "status": "Active",
+    "user_id": "user_17"
+   }
+  ],
+  "screen_subject_user_id": "user_17"
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1839,
+  "output_tokens": 465,
+  "thinking_tokens": 0
+ }
+}

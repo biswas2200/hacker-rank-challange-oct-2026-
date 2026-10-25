@@ -1,0 +1,55 @@
+{
+ "model": "gemini-3.6-flash",
+ "prompt_version": "media-v2",
+ "purpose": "media",
+ "response": {
+  "records": [
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "CS-5034",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": "kagyeman8947@fastmail.com",
+    "email_hash": null,
+    "enabled": null,
+    "name": "Kofi Agyeman",
+    "parent_resource_id": "CS-5034",
+    "phone": null,
+    "resource_id": "support_1034",
+    "restore_allowed": null,
+    "status": null,
+    "user_id": null
+   },
+   {
+    "data_category": null,
+    "email": null,
+    "email_hash": null,
+    "enabled": null,
+    "name": null,
+    "parent_resource_id": null,
+    "phone": null,
+    "resource_id": "ORD-20265034",
+    "restore_allowed": null,
+    "status": "In transit",
+    "user_id": null
+   }
+  ],
+  "screen_subject_user_id": null
+ },
+ "thinking_level": "LOW",
+ "usage": {
+  "input_tokens": 1827,
+  "output_tokens": 361,
+  "thinking_tokens": 0
+ }
+}

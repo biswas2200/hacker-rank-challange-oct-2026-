@@ -1,0 +1,95 @@
+Replication drift means deleted from primary db, but fails
+to delete from the db, an snapshot still remains, in the replica db.
+
+So, the above case should return an incomplete 
+incomplete represents an data fails to delete, as audit
+
+Question:
+
+So far I have understand the case 06 as u mentioned, so in simple
+leila account deleted from the primary db but it happens to be in the 
+secondary db and the evidence is also tells that. 
+My question i have went through the deletion_request.csv file
+and try to find the actual user, but didn't found that, so how the first
+place it went for deletion, also for this problem statement is this my concern or not
+
+So in case 2 the search_001 (or say an search result) doesn't deleted the 
+user name and email, that make the search at 08:45
+
+What is VERIFY_RECORD_ABSENT here u menat? case_06 i didn't understand.
+
+
+##########
+info
+######
+What claude from those design
+
+"
+The link for these two cases is the evidence contents. 
+The activity rows carry only resource_id. 
+The email, user_id or parent account is found by reading the SQL tables, so the agent has to run those files in Python's sqlite3. 
+The sqlite3 command-line tool isn't installed here.
+"
+Doubt {
+    activity_4000, what is the number and what is the activity here means,
+(not understood), The LINK_RESOURCE_IDENTITY rows are not in the samples. They start at activity_4000, and the ones I saw name users like user_11, from cases after case_32. So the full dataset links records in more ways than the samples show.,
+
+
+}
+
+Evidence capture after audit_at must be ignored?? why?? didn't understand
+
+activity status only a claim, ? why this harsh why activity status didn't have an dignity it feels like, then who can i trust for success.
+
+
+study the deletion_rules.csv
+and if u are an agent what would the flow it would be. 
+
+
+
+########
+No Conclusion on this question yet (let see if above questions can answer this)
+########
+"
+I added this turn to transcript.txt and log.txt. Shall I trace the harder samples next (the ones with old emails, tombstones, backups and data flows), or start writing the evidence loader?
+"
+
+
+
+
+
+
+
+[
+ {"step_no":1,"phase":"FINDING","system_id":"search_service","resource_id":"search_001","operation":"REPORT_REMAINING_RECORD","state":"PRESENT","evidence_id":"evidence_57"},
+ {"step_no":2,"phase":"REMEDIATION","system_id":"search_service","resource_id":"search_001","operation":"DELETE_RECORD","state":"ABSENT","evidence_id":""},
+ {"step_no":3,"phase":"VERIFICATION","system_id":"account_service","resource_id":"account_006","operation":"VERIFY_RECORD_ABSENT","state":"ABSENT","evidence_id":""},
+ {"step_no":4,"phase":"VERIFICATION","system_id":"search_service","resource_id":"search_001","operation":"VERIFY_RECORD_ABSENT","state":"ABSENT","evidence_id":""}
+]
+
+
+
+  COMPLETE       │ Everything is gone or properly handled. The steps are only checks that │
+│                │  prove it.                                                             │
+├────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ INCOMPLETE     │ Something is left. The steps are what we found, what to do, and how to │
+│                │  check it afterwards.                                                  │
+├────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ NOT_APPLICABLE │ The person never asked for deletion. The steps are [].                 │
+└────────────────┴────────────────────────────────────────────────────────────────────────┘
+
+The three step phases mean:
+
+- FINDING is "here is the problem."
+- REMEDIATION is "here is the fix."
+- VERIFICATION is "check that this is true afterwards."
+
+VERIFY_RECORD_ABSENT (your case_06 question) means "go look and confirm this record no longer exists." It is a check, not something that already happened. In the INCOMPLETE case above, evidence_id is empty on the fix and the check because they haven't happened yet. Only findings point at real evidence.
+
+
+Does the ai handles this if yes how (There's also a trap in this file. Karim El-Masri has the same last name as Amina, but his email and user ID are different. He is a different person, so we must not report his row for Amina.)
+
+
+ Why is reported_status only a claim? The dashboards said "Complete" while the ghost was alive. Anything a workflow says about itself is a claim. Only evidence (a snapshot, a log line) counts. Look at policy.py: a FAILED activity alone does not produce a finding. We need evidence the record is still there.
+- Why ignore evidence captured after audit_at? The question is "was it deleted as of this date?" Something captured later could show a different world. index.py takes the cutoff on every query, so no later stage can forget it.
+- What are activity_4000 and the other 4000s? They are LINK_RESOURCE_IDENTITY rows, which are a data catalog's notes. For example:
